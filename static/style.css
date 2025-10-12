@@ -1,0 +1,335 @@
+@font-face {
+    font-family: 'Patrick Hand';
+    src: url('/static/fonts/PatrickHand-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+
+
+
+
+:root {
+    --sidebar-bg: #D7DCCF;
+    --sidebar-accent: #98A08B;
+    --topbar-bg: #BDC7B2;
+    --button-bg: #525743;
+    --button-hover: #748464;
+    --cream: #F8F9F4;
+    --card-bg: #FFFFFF;
+    --text-main: #2E2E2E;
+    --text-light: #FAFAFA;
+    --radius: 12px;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Base ===== */
+html,
+body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: "Patrick Hand", cursive;
+    background-color: var(--cream);
+    color: var(--text-main);
+}
+
+body {
+    display: flex;
+}
+
+/* ===== Sidebar ===== */
+.left {
+    width: 20%;
+    background: linear-gradient(180deg, var(--sidebar-bg) 0%, #C9D0C1 100%);
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow);
+    transition: width 0.3s ease;
+}
+
+.logo {
+    padding: 28px 0;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-main);
+    background: var(--sidebar-accent);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    letter-spacing: 1px;
+}
+
+.buttons {
+    flex: 1;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.buttons button {
+    background: var(--button-bg);
+    color: var(--text-light);
+    border: none;
+    padding: 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.25s ease;
+    box-shadow: var(--shadow);
+}
+
+.buttons button:hover {
+    background: var(--button-hover);
+    transform: translateY(-2px);
+}
+
+.idk {
+    padding: 12px;
+    text-align: center;
+    background: var(--sidebar-accent);
+    font-size: 14px;
+    color: var(--text-light);
+    letter-spacing: 0.5px;
+}
+
+/* ===== Main Wrapper ===== */
+.wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.top {
+    height: 10%;
+    background: var(--topbar-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-main);
+    font-weight: 600;
+    box-shadow: var(--shadow);
+    font-size: 20px;
+    letter-spacing: 0.5px;
+    text-align: center;
+    padding: 0 10px;
+}
+
+.main {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+    background: var(--cream);
+}
+
+.bottom {
+    height: 5%;
+    background: var(--topbar-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-main);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    text-align: center;
+    padding: 0 8px;
+}
+
+/* ===== Cards / Inputs ===== */
+.input-card {
+    background: var(--card-bg);
+    padding: 24px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+}
+
+.input-card h2 {
+    color: var(--button-bg);
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.vector-input-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.vector-input-group label {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.vector-input-group input {
+    width: 80px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: var(--radius);
+    text-align: center;
+    font-size: 15px;
+    background-color: #FAF7F6;
+    transition: 0.2s;
+}
+
+.vector-input-group input:focus {
+    border-color: var(--button-bg);
+    box-shadow: 0 0 5px rgba(142, 156, 126, 0.4);
+    outline: none;
+    background-color: #fff;
+}
+
+select {
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    border: 1px solid #ccc;
+    background-color: #fff;
+    font-size: 15px;
+    margin-left: 10px;
+    transition: 0.2s;
+}
+
+select:focus,
+select:hover {
+    border-color: var(--button-bg);
+    box-shadow: 0 0 5px rgba(142, 156, 126, 0.4);
+    outline: none;
+}
+
+label[for="input_type"] {
+    font-weight: bold;
+    font-size: 16px;
+    color: var(--button-bg);
+}
+
+button[type="submit"] {
+    background: var(--button-bg);
+    color: var(--text-light);
+    border: none;
+    padding: 10px 24px;
+    border-radius: var(--radius);
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: var(--shadow);
+}
+
+button[type="submit"]:hover {
+    background: var(--button-hover);
+}
+
+/* ===== Output Section ===== */
+.output-section {
+    background: var(--card-bg);
+    padding: 24px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-top: 20px;
+}
+
+.output-section h2 {
+    color: var(--button-bg);
+}
+
+.output-section li {
+    background: #fffefc;
+    border: 1px solid #e9e1d8;
+    border-radius: var(--radius);
+    padding: 8px 10px;
+    margin: 5px 0;
+    font-size: 18px;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 1024px) {
+    .left {
+        width: 25%;
+    }
+
+    .main {
+        padding: 24px;
+    }
+
+    .buttons button {
+        font-size: 15px;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+
+    .left {
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+        justify-content: space-around;
+    }
+
+    .logo {
+        display: none;
+    }
+
+    .buttons {
+        flex-direction: row;
+        justify-content: space-evenly;
+        padding: 10px;
+        gap: 8px;
+    }
+
+    .buttons button {
+        flex: 1;
+        min-width: 100px;
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .idk {
+        display: none;
+    }
+
+    .top {
+        font-size: 18px;
+        padding: 10px;
+    }
+
+    .main {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .buttons button {
+        font-size: 13px;
+        padding: 6px;
+    }
+
+    .input-card,
+    .output-section {
+        padding: 16px;
+    }
+
+    .vector-input-group input {
+        width: 60px;
+        font-size: 14px;
+    }
+
+    .output-section li {
+        font-size: 16px;
+    }
+
+    .top {
+        font-size: 16px;
+    }
+
+    .bottom {
+        font-size: 12px;
+    }
+}

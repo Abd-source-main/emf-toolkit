@@ -1,0 +1,20 @@
+<!-- VECTOR INPUTS MACRO -->
+{% macro vector_inputs(vector_num, input_data, has_charge) %}
+<div class="input-card">
+    <!-- VECTOR {{ vector_num }} must be 1 or 2 for identification in the backend -->
+    <h2>Vector {{ vector_num }}</h2>
+    <div class="vector-input-group">
+        <label>x:</label>
+        <input type="number" name="input_x{{ vector_num }}" value="{{ input_data[0] if input_data else '' }}">
+        <label>y:</label>
+        <input type="number" name="input_y{{ vector_num }}" value="{{ input_data[1] if input_data else '' }}">
+        <label>z:</label>
+        <input type="number" name="input_z{{ vector_num }}" value="{{ input_data[2] if input_data else '' }}">
+        {% if has_charge %}
+        <label>c:</label>
+        <input type="number" name="input_c{{ vector_num }}" value="{{ input_data[3] if input_data else '' }}">
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
+<!-- end input macro -->
