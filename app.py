@@ -1,8 +1,9 @@
 # for pushing changes to github
-# git add .
-# git commit -m "your update message"
-# git push origin main
-
+""" 
+ git add .
+ git commit -m "your update message"
+ git push origin main
+"""
 
 # venv\Scripts\activate
 # python -m pip install numpy
