@@ -1,3 +1,9 @@
+# for pushing changes to github
+# git add .
+# git commit -m "your update message"
+# git push origin main
+
+
 # venv\Scripts\activate
 # python -m pip install numpy
 # "python -m" ensures pip installs it for the exact python interpreter
