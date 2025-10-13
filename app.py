@@ -4,8 +4,10 @@
  git commit -m "your update message"
  git push origin main
 """
-
+# Activate virtual environment
 # venv\Scripts\activate
+
+# flask run --host 0.0.0.0
 # python -m pip install numpy
 # "python -m" ensures pip installs it for the exact python interpreter
 
