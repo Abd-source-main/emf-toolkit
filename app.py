@@ -4,6 +4,13 @@
  git commit -m "add charge description to output and remove js code"
  git push origin main
 """
+"""
+# for pulling changes from github
+cd ~/emf-toolkit
+git pull
+
+"""
+
 # Activate virtual environment
 # venv\Scripts\activate
 
