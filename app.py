@@ -1,7 +1,7 @@
 # for pushing changes to github
 """ 
  git add .
- git commit -m "your update message"
+ git commit -m "add charge description to output and remove js code"
  git push origin main
 """
 # Activate virtual environment

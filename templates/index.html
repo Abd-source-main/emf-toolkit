@@ -5,7 +5,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <meta name="theme-color" content="#7b7e6b">
 
     <title>EMF Toolkit</title>
@@ -38,7 +37,7 @@
                 <label for="input_type">Select Input Type:</label>
                 <select id="input_type" name="input_type" onchange="this.form.submit()">
                     <option value="two vectors with c" {% if input_type=="two vectors with c" %}selected{% endif %}>Two
-                        vectors </option>
+                        vectors with charges</option>
                     <option value="two vectors without c" {% if input_type=="two vectors without c" %}selected{% endif
                         %}>Two vectors </option>
                     <option value="single vector" {% if input_type=="single vector" %}selected{% endif %}>Single vector
@@ -92,14 +91,6 @@
         </div>
         <div class="bottom">Developed by ABD — EMF Suite Calculator---Alpha Version</div>
     </div>
-    <script>
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("{{ url_for('static', filename='service-worker.js') }}")
-                .then(reg => console.log("Service Worker registered:", reg))
-                .catch(err => console.error("Service Worker failed:", err));
-        }
-    </script>
-
 
 </body>
 
