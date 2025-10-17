@@ -14,8 +14,7 @@
 from flask import Flask, render_template, request
 import threading
 import webview
-from my_utils import *
-
+from controllers import process_input, static_var
 app = Flask(__name__)
 
 
