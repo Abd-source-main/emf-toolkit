@@ -1,7 +1,6 @@
 import numpy as np
 from math import sqrt
 import math
-from flask import Flask, render_template, request
 
 
 class Vector:
