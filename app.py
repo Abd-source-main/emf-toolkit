@@ -3,20 +3,20 @@
  git add .
  git commit -m "add charge description to output and remove js code"
  git push origin main
+
 """
 """
 # for pulling changes from github
+
 cd ~/emf-toolkit
-git pull
+git fetch origin
+git reset --hard origin/main
+
 
 """
 
 # Activate virtual environment
 # venv\Scripts\activate
-
-# flask run --host 0.0.0.0
-# python -m pip install numpy
-# "python -m" ensures pip installs it for the exact python interpreter
 
 from flask import Flask, render_template, request
 import threading

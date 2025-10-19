@@ -45,9 +45,8 @@ def dot(v1, v2):
 def vector_12(v1, v2):
     return Vector.convert_to_vector(np.array(v2.nxyz) - np.array(v1.nxyz))
 
+
 # vector
-
-
 def electric_force(v1, v2, q1, q2):
     # r is a vector
     r = vector_12(v1, v2)
@@ -56,17 +55,15 @@ def electric_force(v1, v2, q1, q2):
     force = scaler * r.nxyz if r.magnitude() != 0 else 'can NOT divide by zero'
     return Vector.convert_to_vector(force)
 
+
 # vector
-
-
 def electrical_field(v1, v2, q1):
     # E = F/q2 (when q2 = 1 --> E = F)
     E = electric_force(v1, v2, q1, 1)
     return E
 
+
 # scalar
-
-
 def electrical_potential(v1, v2, q1):
     r = vector_12(v1, v2).magnitude()
     # V = k * q1 / r
@@ -82,7 +79,7 @@ def flux_density(v1, v2, q1, Er=1):
         electrical_field(v1, v2, q1), Vector) else 'can NOT divide by zero'
     return D
 
-# unedeted ..............................................................
+# unedited ..............................................................
 
 
 def cartesian_to_spherical(x, y, z):

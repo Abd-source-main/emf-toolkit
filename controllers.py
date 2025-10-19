@@ -52,8 +52,9 @@ def process_input(request, input_type):
         # do output
         unit2 = v2.unit_vector()
         mag2 = v2.magnitude()
-        mag = vector_12(v1, v2).magnitude()
-        unit = vector_12(v1, v2).unit_vector()
+        v12 = vector_12(v1, v2)
+        mag = v12.magnitude()
+        unit = v12.unit_vector()
         cross_prod = cross(v1, v2)
         dot_prod = dot(v1, v2)
 
@@ -77,6 +78,8 @@ def process_input(request, input_type):
     if input_type == "two vectors with c":
         static_var.input = [*v1.xyz, v1.charge, *v2.xyz, v2.charge]
         static_var.output = [
+            f"vector2 - vector1: {to_list_and_round_for_output(v12)}",
+            f"vector1 + vector2: {to_list_and_round_for_output(v1.nxyz + v2.nxyz)}",
             f"magnitude of vector12: {to_list_and_round_for_output(mag)}",
             f"unit vector of vector12: {to_list_and_round_for_output(unit)}",
             f"force vector of vector12: {to_list_and_round_for_output(f)}",
@@ -93,6 +96,8 @@ def process_input(request, input_type):
     elif input_type == "two vectors without c":
         static_var.input = [*v1.xyz, *v2.xyz]
         static_var.output = [
+            f"vector2 - vector1: {to_list_and_round_for_output(v12)}",
+            f"vector1 + vector2: {to_list_and_round_for_output(v1.nxyz + v2.nxyz)}",
             f"magnitude of vector12: {to_list_and_round_for_output(mag)}",
             f"unit vector of vector12: {to_list_and_round_for_output(unit)}",
             f"cross product vector of vector12: {to_list_and_round_for_output(cross_prod)}",
