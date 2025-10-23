@@ -1,4 +1,5 @@
 from my_utils import *
+from sketch import *
 from flask import Flask, render_template, request
 
 
@@ -117,3 +118,24 @@ def process_input(request, input_type):
         static_var.input = []
         static_var.output = ["Select an input type"]
     return static_var.output, static_var.input
+
+
+def process_form_request(request):
+    # Sidebar buttons
+    if "button" in request.form:
+        btn = request.form.get("button")
+        static_var.button = btn if btn in [
+            "button_one", "button_two", "button_three"] else "Unknown button"
+
+    # Input type select
+    elif "input_type" in request.form:
+        input_type = request.form.get("input_type")
+        static_var.input_type = input_type if input_type in [
+            "two vectors with c", "two vectors without c", "single vector"] else "two vectors with c"
+
+    # Vector input fields
+    elif "input_x1" in request.form:  # detect vector submission
+        static_var.output, static_var.input = process_input(
+            request, static_var.input_type)
+
+    return static_var.button, static_var.input, static_var.output, static_var.input_type
