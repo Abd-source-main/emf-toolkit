@@ -1,7 +1,7 @@
 <!-- VECTOR INPUTS MACRO -->
-{% macro vector_inputs(vector_num, input_data, has_charge) %}
+{% macro vector_inputs(vector_num, input_data, has_charge,is_sketch = False) %}
 <div class="input-card">
-    <!-- VECTOR {{ vector_num }} must be 1 or 2 for identification in the backend -->
+    <!-- VECTOR {{ vector_num }} must be 1 or 2 or '' for identification in the backend -->
     <h2>Vector {{ vector_num }}</h2>
     <div class="vector-input-group">
         <label>x:</label>
@@ -13,6 +13,16 @@
         {% if has_charge %}
         <label>c:</label>
         <input type="number" name="input_c{{ vector_num }}" value="{{ input_data[3] if input_data else '' }}">
+        {% elif is_sketch %}
+        <button type="submit" name="sketch_button" value="submit">Submit</button>
+        <button type="submit" name="sketch_button" value="reset">Reset</button>
+        <label for="system" style="font-size: large; margin-left: auto;">Choose a system to sketch
+            with:</label>
+        <select name="system" id="system" style="padding: 10px; ">
+            <option value="cartesian">Cartesian</option>
+            <option value="cylindrical">Cylindrical</option>
+            <option value="spherical">Spherical</option>
+        </select>
         {% endif %}
     </div>
 </div>

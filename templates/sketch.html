@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='sketch.css') }}">
+    <title>Cartesian Sketch</title>
+</head>
+
+<body style="flex-direction: column;">
+    {% from "macros.html" import vector_inputs %}
+    <form method="post" style="padding: 16px; width: 100%;  ">
+        {{ vector_inputs("",[],False,is_sketch=True) }}
+    </form>
+    <div calss='plot-wrapper'>
+        {{ plot_html|safe }}
+    </div>
+</body>
+
+</html>

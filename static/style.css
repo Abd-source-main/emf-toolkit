@@ -121,6 +121,8 @@ body {
 .main {
     flex: 1;
     padding: 40px;
+    display: flex;
+    flex-direction: column;
     overflow-y: auto;
     background: var(--cream);
 }
@@ -219,6 +221,18 @@ button[type="submit"] {
     box-shadow: var(--shadow);
 }
 
+button[type="rest"] {
+    background: var(--button-bg);
+    color: var(--text-light);
+    border: none;
+    padding: 10px 24px;
+    border-radius: var(--radius);
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: var(--shadow);
+}
+
 button[type="submit"]:hover {
     background: var(--button-hover);
 }
@@ -244,6 +258,59 @@ button[type="submit"]:hover {
     margin: 5px 0;
     font-size: 18px;
 }
+
+.buttons label {
+    background: var(--button-bg);
+    color: var(--text-light);
+    padding: 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    display: inline-block;
+    box-shadow: var(--shadow);
+    transition: all 0.25s ease;
+}
+
+/* Hide extra buttons by default */
+.extra-buttons {
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 12px;
+}
+
+
+
+#toggle-buttons {
+    display: none;
+}
+
+/* Show when checkbox is checked */
+#toggle-buttons:checked+label+.extra-buttons {
+    display: flex;
+}
+
+/* Style the toggle label like a button */
+label[for="toggle-buttons"] {
+    background: var(--button-bg);
+    color: var(--text-light);
+    padding: 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: var(--shadow);
+    transition: all 0.25s ease;
+    display: inline-block;
+}
+
+label[for="toggle-buttons"]:hover {
+    background: var(--button-hover);
+    transform: translateY(-2px);
+}
+
 
 /* ===== Responsive Design ===== */
 @media (max-width: 1024px) {

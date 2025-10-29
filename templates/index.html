@@ -18,7 +18,15 @@
         <div class="logo">EMF Toolkit</div>
         <form class="buttons" method="POST">
             <button name="button" value="button_one">Main content </button>
-            <button name="button" value="button_two">Sketch-under development</button>
+            <input type="checkbox" id="toggle-buttons">
+            <!-- toggle button -->
+            <label for="toggle-buttons">Sketch</label>
+            <div class="extra-buttons buttons">
+                <button name="button" value="cartesian">Cartesian</button>
+                <button name="button" value="cylindrical">Cylindrical</button>
+                <button name="button" value="spherical">Spherical</button>
+            </div>
+
             <button name="button" value="button_three">Settings maybe idk</button>
         </form>
         <div class="idk">v0.1-alpha</div>
@@ -26,12 +34,14 @@
 
     <div class="wrapper">
         <div class="top">Electromagnetic Fields</div>
+
         <div class="main">
+
 
             {% if button_section == "home" %}
             <h1>Welcome</h1>
             <p>Select a button from the left to begin</p>
-
+            <!-- button 1 -->
             {% elif button_section == "button_one" %}
             <form method="POST" class="input-card">
                 <label for="input_type">Select Input Type:</label>
@@ -82,11 +92,17 @@
                 </ul>
             </div>
             {% endif %}
-            {% elif button_section == "button_two" %}
-            <h2>Sketch Module (Coming soon)</h2>
+
+
+
+
+            <!-- button 3 -->
             {% elif button_section == "button_three" %}
             <h2>Settings</h2>
             <p>Under development</p>
+            {% else %}
+            <h2>Unknown Section</h2>
+            <p>Please select a valid section from the left.</p>
             {% endif %}
         </div>
         <div class="bottom">Developed by ABD — EMF Suite Calculator---Alpha Version</div>

@@ -1,6 +1,5 @@
 from my_utils import *
-from sketch import *
-from flask import Flask, render_template, request
+import sketch as sk
 
 
 # To have similar to a static variable in c++
@@ -120,22 +119,39 @@ def process_input(request, input_type):
     return static_var.output, static_var.input
 
 
-def process_form_request(request):
+def process_form_request_home(request):
     # Sidebar buttons
     if "button" in request.form:
         btn = request.form.get("button")
         static_var.button = btn if btn in [
-            "button_one", "button_two", "button_three"] else "Unknown button"
+            "button_one", "cartesian", "cylindrical", "spherical", "button_three"] else "home"
 
     # Input type select
-    elif "input_type" in request.form:
+    if "input_type" in request.form:
         input_type = request.form.get("input_type")
         static_var.input_type = input_type if input_type in [
-            "two vectors with c", "two vectors without c", "single vector"] else "two vectors with c"
+            "two vectors with c", "two vectors without c", "single vector"] else "single vector"
 
     # Vector input fields
-    elif "input_x1" in request.form:  # detect vector submission
+    if "input_x1" in request.form:  # detect vector submission
         static_var.output, static_var.input = process_input(
             request, static_var.input_type)
-
     return static_var.button, static_var.input, static_var.output, static_var.input_type
+
+
+def process_form_sketch(request):
+    if "sketch_button" in request.form:  # detect sketch submision
+        button = request.form.get("sketch_button")
+        if button == "submit":
+            x = float(request.form.get("input_x")
+                      )if request.form.get("input_x") else 0
+            y = float(request.form.get("input_y")
+                      )if request.form.get("input_y") else 0
+            z = float(request.form.get("input_z")
+                      )if request.form.get("input_z") else 0
+            return [x, y, z]
+        elif button == "reset":
+            setattr(sk.create_cartesian_sketch, "initialized", False)
+            return []
+
+    return []
