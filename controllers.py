@@ -1,8 +1,8 @@
 from my_utils import *
-import sketch as sk
-
 
 # To have similar to a static variable in c++
+
+
 class static_var:
     button = "home"
     output = []
@@ -151,7 +151,6 @@ def process_form_sketch(request):
                       )if request.form.get("input_z") else 0
             return [x, y, z]
         elif button == "reset":
-            setattr(sk.create_cartesian_sketch, "initialized", False)
-            return []
+            return ["reset"]
 
     return []

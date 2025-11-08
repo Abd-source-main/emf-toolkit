@@ -9,11 +9,11 @@
 </head>
 
 <body style="flex-direction: column;">
-    {% from "macros.html" import vector_inputs %}
+    {% from "macros.html" import sketch_input %}
     <form method="post" style="padding: 16px; width: 100%;  ">
-        {{ vector_inputs("",[],False,is_sketch=True) }}
+        {{ sketch_input() }}
     </form>
-    <div calss='plot-wrapper'>
+    <div class='plot-wrapper'>
         {{ plot_html|safe }}
     </div>
 </body>

@@ -26,6 +26,10 @@ body {
 }
 
 .input-card h2 {
+    margin-top: 0px;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
     color: #525743;
     margin-bottom: 10px;
 }

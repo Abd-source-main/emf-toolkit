@@ -1,7 +1,7 @@
 # for pushing changes to github
 """ 
  git add .
- git commit -m "add sketch route and functionalize it"
+ git commit -m "just shorted the requirment"
  git push origin main
 
 """
@@ -18,11 +18,12 @@ git reset --hard origin/main
 # Activate virtual environment
 # venv\Scripts\activate
 
-import sketch as sk
-import controllers as ctrl
 from flask import Flask, render_template, request, redirect
+import controllers as ctrl
+from sketch import sketch_cartesian
 
 app = Flask(__name__)
+skc = sketch_cartesian()
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -42,8 +43,12 @@ def home():
 
 @app.route("/cartesian_sketch", methods=["GET", "POST"])
 def cartesian_sketch():
+    global skc
     data = ctrl.process_form_sketch(request)
-    plot_html = sk.create_cartesian_sketch(data)
+    if data == ["reset"]:
+        skc.reinitialize(is_first_time=True)
+        data.clear()
+    plot_html = skc.create_cartesian_sketch(strdata=data)
     return render_template("sketch.html",
                            plot_html=plot_html)
 
