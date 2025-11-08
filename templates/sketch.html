@@ -10,9 +10,27 @@
 
 <body style="flex-direction: column;">
     {% from "macros.html" import sketch_input %}
+
+    <!-- Cartesian Input -->
+    {% if system == 'cartesian' %}
     <form method="post" style="padding: 16px; width: 100%;  ">
-        {{ sketch_input() }}
+        {{ sketch_input('cartesian') }}
     </form>
+
+    <!-- cylindrical Input -->
+    {% elif system == 'cylindrical' %}
+    <form method="post" style="padding: 16px; width: 100%;  ">
+        {{ sketch_input('cylindrical') }}
+    </form>
+
+    <!-- spherical Input -->
+    {% elif system == 'spherical' %}
+    <form method="post" style="padding: 16px; width: 100%;  ">
+        {{ sketch_input('spherical') }}
+    </form>
+    {% else %}
+    <p>Error: Unknown system.</p>
+    {% endif %}
     <div class='plot-wrapper'>
         {{ plot_html|safe }}
     </div>

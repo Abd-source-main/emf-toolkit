@@ -20,18 +20,18 @@ git reset --hard origin/main
 
 from flask import Flask, render_template, request, redirect
 import controllers as ctrl
-from sketch import sketch_cartesian
+from sketch import Sketch_cartesian
 
 app = Flask(__name__)
-skc = sketch_cartesian()
+skc = Sketch_cartesian()
 
 
 @app.route("/", methods=["GET", "POST"])
 def home():
     button, input, output, input_type = ctrl.process_form_request_home(request)
-    if button == "cartesian":
+    if button in ["cartesian", "cylindrical", "spherical"]:
         ctrl.static_var.button = "home"
-        return redirect('/cartesian_sketch')
+        return redirect(f'/{button}_sketch')
     return render_template(
         "index.html",
         button_section=button,
@@ -48,9 +48,22 @@ def cartesian_sketch():
     if data == ["reset"]:
         skc.reinitialize(is_first_time=True)
         data.clear()
+    elif data and data[0] in ["cartesian", "cylindrical", "spherical"]:
+        return redirect(f'/{data[0]}_sketch')
     plot_html = skc.create_cartesian_sketch(strdata=data)
     return render_template("sketch.html",
+                           system="cartesian",
                            plot_html=plot_html)
+
+
+@app.route("/cylindrical_sketch", methods=["GET", "POST"])
+def cylindrical_sketch():
+    return "cylindrical sketch page"
+
+
+@app.route("/spherical_sketch", methods=["GET", "POST"])
+def spherical_sketch():
+    return "spherical sketch page"
 
 
 def run_flask():

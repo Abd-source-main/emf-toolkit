@@ -152,5 +152,8 @@ def process_form_sketch(request):
             return [x, y, z]
         elif button == "reset":
             return ["reset"]
-
+    elif "system_type" in request.form:  # detect system type change
+        system_type = request.form.get("system_type")
+        if system_type in ["cartesian", "cylindrical", "spherical"]:
+            return [system_type]
     return []

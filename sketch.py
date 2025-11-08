@@ -1,6 +1,7 @@
 import plotly.graph_objects as go
 import random
 import numpy as np
+from my_utils import CoordinateConverter as CC
 
 
 class Vector_colors:
@@ -26,7 +27,7 @@ class Vector_colors:
         return color
 
 
-class sketch_element:
+class Sketch_element:
     def __init__(self, config):
         self.config = config
     # data must be a list of dictionaries with start and end points
@@ -96,32 +97,111 @@ class sketch_element:
         ))
 
 
-class sketch_cartesian:
+class Sketch_plane:
+    # lists of dict to store vectors data
+    counter = 1
+    xyz_vectors = []
+    ppz_vectors = []
+    rtp_vectors = []
+
+    @classmethod
+    def add_counter(cls):
+        cls.counter += 1
+
+    @classmethod
+    def reset_counter(cls):
+        cls.counter = 1
+
+    @classmethod
+    def add_xyz_vector(cls, vector):
+        cls.xyz_vectors.append(vector)
+
+        # Cartesian -> Cylindrical
+        rho, phi, z = CC.cartesian_to_cylindrical(*vector['end'])
+        cls.ppz_vectors.append({
+            'start': (0, 0, 0),
+            'end': (rho, phi, z),
+            'name': vector['name']
+        })
+
+        # Cartesian -> Spherical
+        radius, theta, phi = CC.cartesian_to_spherical(*vector['end'])
+        cls.rtp_vectors.append({
+            'start': (0, 0, 0),
+            'end': (radius, theta, phi),
+            'name': vector['name']
+        })
+
+    @classmethod
+    def add_ppz_vector(cls, vector):
+        cls.ppz_vectors.append(vector)
+
+        # Cylindrical -> Cartesian
+        x, y, z = CC.cylindrical_to_cartesian(*vector['end'])
+        cls.xyz_vectors.append({
+            'start': (0, 0, 0),
+            'end': (x, y, z),
+            'name': vector['name']
+        })
+
+        # Cylindrical -> Spherical
+        radius, theta, phi = CC.cylindrical_to_spherical(*vector['end'])
+        cls.rtp_vectors.append({
+            'start': (0, 0, 0),
+            'end': (radius, theta, phi),
+            'name': vector['name']
+        })
+
+    @classmethod
+    def add_rtp_vector(cls, vector):
+        cls.rtp_vectors.append(vector)
+
+        # Spherical -> Cartesian
+        x, y, z = CC.spherical_to_cartesian(*vector['end'])
+        cls.xyz_vectors.append({
+            'start': (0, 0, 0),
+            'end': (x, y, z),
+            'name': vector['name']
+        })
+
+        # Spherical -> Cylindrical
+        rho, phi, z = CC.spherical_to_cylindrical(*vector['end'])
+        cls.ppz_vectors.append({
+            'start': (0, 0, 0),
+            'end': (rho, phi, z),
+            'name': vector['name']
+        })
+
+
+class Sketch_cartesian(Sketch_plane):
+
     def __init__(self):
         self.reinitialize(is_first_time=True)
 
     def reinitialize(self, is_first_time=True):
         self.fig = go.Figure()
-        self.sk = sketch_element(self.fig)
+        self.sk = Sketch_element(self.fig)
         if is_first_time:
-            self.counter = 1
-            self.vectors = []
+            self.reset_counter()
+            self.xyz_vectors.clear()
+            self.ppz_vectors.clear()
+            self.rtp_vectors.clear()
             self.larger_z = self.larger_y = self.larger_x = 1
 
     def add_input_vector(self, vector):
-        # defin inputed vector
-        input_vector = {"start": (0, 0, 0), "end": (
-            vector[0], vector[1], vector[2]),
-            "name": f"vector-{self.counter}"}
-        self.counter += 1
+        # define inputed vector
+        input_vector = {"start": (0, 0, 0),
+                        "end": (vector[0], vector[1], vector[2]),
+                        "name": f"vector-{self.counter}"}
+        self.add_counter()
 
         # re sketch every inputed vector
-        for i in self.vectors:
+        for i in self.xyz_vectors:
             self.sk.sketch_vector(i)
         self.sk.sketch_vector(input_vector)
 
         # add the new vector to vectors list
-        self.vectors.append(input_vector)
+        self.add_xyz_vector(input_vector)
 
     def create_cartesian_sketch(self, strdata=[]):
         self.reinitialize(is_first_time=False)

@@ -79,38 +79,60 @@ def flux_density(v1, v2, q1, Er=1):
         electrical_field(v1, v2, q1), Vector) else 'can NOT divide by zero'
     return D
 
-# unedited ..............................................................
 
+class CoordinateConverter:
+    @staticmethod
+    def cartesian_to_spherical(x, y, z):
+        """
+        Cartesian (x, y, z) -> Spherical (radius, theta, phi)
+        """
+        radius = math.sqrt(x ** 2 + y ** 2 + z ** 2)
+        theta = math.atan2(y, x)
+        phi = math.acos(z / radius) if radius != 0 else 0
+        return radius, theta, phi
 
-def cartesian_to_spherical(x, y, z):
-    r = math.sqrt(x ** 2 + y ** 2 + z ** 2)
-    theta = math.atan2(y, x)
-    phi = math.acos(z / r) if r != 0 else 0
-    return r, theta, phi
+    @staticmethod
+    def spherical_to_cartesian(radius, theta, phi):
+        """
+        Spherical (radius, theta, phi) -> Cartesian (x, y, z)
+        """
+        x = radius * math.sin(phi) * math.cos(theta)
+        y = radius * math.sin(phi) * math.sin(theta)
+        z = radius * math.cos(phi)
+        return x, y, z
 
+    @staticmethod
+    def cartesian_to_cylindrical(x, y, z):
+        """
+        Cartesian (x, y, z) -> Cylindrical (rho, phi, z)
+        """
+        rho = math.sqrt(x ** 2 + y ** 2)
+        phi = math.atan2(y, x)
+        return rho, phi, z
 
-def spherical_to_cartesian(r, theta, phi):
-    x = r * math.sin(phi) * math.cos(theta)
-    y = r * math.sin(phi) * math.sin(theta)
-    z = r * math.cos(phi)
-    return x, y, z
+    @staticmethod
+    def cylindrical_to_cartesian(rho, phi, z):
+        """
+        Cylindrical (rho, phi, z) -> Cartesian (x, y, z)
+        """
+        x = rho * math.cos(phi)
+        y = rho * math.sin(phi)
+        return x, y, z
 
+    @staticmethod
+    def spherical_to_cylindrical(radius, theta, phi):
+        """
+        cuz idk how there is this
+        """
+        x, y, z = CoordinateConverter.spherical_to_cartesian(
+            radius, theta, phi)
+        return CoordinateConverter.cartesian_to_cylindrical(x, y, z)
 
-def cartesian_to_cylindrical(fi, sec, thrd):
-    x = fi
-    y = sec
-    z = thrd
-    r = math.sqrt(x ** 2 + y ** 2)
-    theta = math.atan2(y, x)
-    return r, theta, z
+    @staticmethod
+    def cylindrical_to_spherical(rho, phi, z):
+        """
+        cuz idk how there is this
+        """
 
-
-def cylindrical_to_cartesian(fi, sec, thrd):
-    r = fi
-    theta = sec
-    z = thrd
-    x = r * math.cos(theta)
-    y = r * math.sin(theta)
-    return x, y, z
-
-# ......................................................
+        x, y, z = CoordinateConverter.cylindrical_to_cartesian(rho, phi, z)
+        return CoordinateConverter.cartesian_to_spherical(x, y, z)
