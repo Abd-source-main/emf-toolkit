@@ -5,19 +5,38 @@
     <h2>Vector {{ vector_num }}</h2>
     <div class="vector-input-group">
         <label>x:</label>
-        <input type="number" name="input_x{{ vector_num }}" value="{{ input_data[0] if input_data else '' }}">
+        <input type="number" step="any" name="input_x{{ vector_num }}"
+            value="{{ input_data[0] if input_data else '' }}">
         <label>y:</label>
-        <input type="number" name="input_y{{ vector_num }}" value="{{ input_data[1] if input_data else '' }}">
+        <input type="number" step="any" name="input_y{{ vector_num }}"
+            value="{{ input_data[1] if input_data else '' }}">
         <label>z:</label>
-        <input type="number" name="input_z{{ vector_num }}" value="{{ input_data[2] if input_data else '' }}">
+        <input type="number" step="any" name="input_z{{ vector_num }}"
+            value="{{ input_data[2] if input_data else '' }}">
         {% if has_charge %}
         <label>c:</label>
-        <input type="number" name="input_c{{ vector_num }}" value="{{ input_data[3] if input_data else '' }}">
+        <input type="number" step="any" name="input_c{{ vector_num }}"
+            value="{{ input_data[3] if input_data else '' }}">
         {% endif %}
     </div>
 </div>
 {% endmacro %}
 <!-- end input macro -->
+<!-- parts of sketch input card -->
+{% macro part_of_sketch_input() %}
+<button type="submit" name="sketch_button" value="submit">Submit</button>
+<button type="submit" name="sketch_button" value="reset">Reset</button>
+<form method="post">
+    <label for="system_type" style="font-size: large; margin-left: auto;">Choose a system:</label>
+    <select name="system_type" id="system_type" style="padding: 10px;" onchange="this.form.submit()">
+        <option hidden>Systems</option>
+        <option value="cartesian">Cartesian</option>
+        <option value="cylindrical">Cylindrical</option>
+        <option value="spherical">Spherical</option>
+    </select>
+</form>
+{% endmacro %}
+<!-- end parts of sketch input card -->
 
 <!-- sketch input card -->
 {% macro sketch_input(system) %}
@@ -30,62 +49,37 @@
     </h2>
     {% if system == 'cartesian' %}
     <div class="vector-input-group">
-        <label for="input_x">x:</label>
-        <input type="number" name="input_x">
-        <label for="input_y">y:</label>
-        <input type="number" name="input_y">
-        <label for="input_z">z:</label>
-        <input type="number" name="input_z">
-        <button type="submit" name="sketch_button" value="submit">Submit</button>
-        <button type="submit" name="sketch_button" value="reset">Reset</button>
-        <form method="post">
-            <label for="system_type" style="font-size: large; margin-left: auto;">Choose a system:</label>
-            <select name="system_type" id="system_type" style="padding: 10px;" onchange="this.form.submit()">
-                <option value="cartesian">Cartesian</option>
-                <option value="cylindrical">Cylindrical</option>
-                <option value="spherical">Spherical</option>
-            </select>
-        </form>
+        <label for="input_i">x:</label>
+        <input type="number" step="any" name="input_i">
+        <label for="input_j">y:</label>
+        <input type="number" step="any" name="input_j">
+        <label for="input_k">z:</label>
+        <input type="number" step="any" name="input_k">
+        {{ part_of_sketch_input() }}
     </div>
 </div>
 {% elif system == 'cylindrical' %}
 <div class="vector-input-group">
-    <label for="input_r">r:</label>
-    <input type="number" name="input_r">
-    <label for="input_theta">θ (degrees):</label>
-    <input type="number" name="input_theta">
-    <label for="input_z">z:</label>
-    <input type="number" name="input_z">
-    <button type="submit" name="sketch_button" value="submit">Submit</button>
-    <button type="submit" name="sketch_button" value="reset">Reset</button>
-    <form method="post">
-        <label for="system_type" style="font-size: large; margin-left: auto;">Choose a system:</label>
-        <select name="system_type" id="system_type" style="padding: 10px;" onchange="this.form.submit()">
-            <option value="cartesian">Cartesian</option>
-            <option value="cylindrical">Cylindrical</option>
-            <option value="spherical">Spherical</option>
-        </select>
-    </form>
+    <label for="input_i">ρ:</label>
+    <input type="number" step="any" name="input_i">
+    <label for="input_j">φ (degrees):</label>
+    <input type="number" step="any" name="input_j">
+    <label for="input_k">z:</label>
+    <input type="number" step="any" name="input_k">
+    {{ part_of_sketch_input() }}
+
 </div>
 </div>
 {% elif system == 'spherical' %}
 <div class="vector-input-group">
     <label for="input_r">r:</label>
-    <input type="number" name="input_r">
-    <label for="input_theta">θ (degrees):</label>
-    <input type="number" name="input_theta">
-    <label for="input_phi">φ (degrees):</label>
-    <input type="number" name="input_phi">
-    <button type="submit" name="sketch_button" value="submit">Submit</button>
-    <button type="submit" name="sketch_button" value="reset">Reset</button>
-    <form method="post">
-        <label for="system_type" style="font-size: large; margin-left: auto;">Choose a system:</label>
-        <select name="system_type" id="system_type" style="padding: 10px;" onchange="this.form.submit()">
-            <option value="cartesian">Cartesian</option>
-            <option value="cylindrical">Cylindrical</option>
-            <option value="spherical">Spherical</option>
-        </select>
-    </form>
+    <input type="number" step="any" name="input_r">
+    <label for="input_j">θ (degrees):</label>
+    <input type="number" step="any" name="input_j">
+    <label for="input_k">φ (degrees):</label>
+    <input type="number" step="any" name="input_k">
+    {{ part_of_sketch_input() }}
+
 </div>
 </div>
 {% endif %}
