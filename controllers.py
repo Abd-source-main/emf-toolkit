@@ -1,4 +1,7 @@
+from flask import flash
 from my_utils import *
+import physics_applications
+
 
 # To have similar to a static variable in c++
 
@@ -10,44 +13,22 @@ class static_var:
     input_type = "two vectors with c"
 
 
-def to_list_and_round_for_output(v):
-    # convert Vector or np.array to a plain list of floats rounded to 3 decimal places
-    if isinstance(v, Vector):
-        return [float(round(x, 3)) for x in v.xyz]   # unpack Vector
-    elif isinstance(v, np.ndarray):
-        return [float(round(x, 3)) for x in v]        # unpack NumPy array
-    elif isinstance(v, list):
-        return [float(round(x, 3)) for x in v]        # unpack list
-    elif isinstance(v, str):
-        return v
-    else:
-        return round(v, 3)
-
-
 def process_input(request, input_type):
-    x1 = float(request.form.get("input_x1")
-               )if request.form.get("input_x1") else 0
-    y1 = float(request.form.get("input_y1")
-               )if request.form.get("input_y1") else 0
-    z1 = float(request.form.get("input_z1")
-               )if request.form.get("input_z1") else 0
+    x1, y1, z1 = ProcessForm.get_form_input(
+        request, ["input_x1", "input_y1", "input_z1"])
     v1 = Vector(x1, y1, z1)
     unit1 = v1.unit_vector()
     mag1 = v1.magnitude()
     if input_type == "single vector":
         static_var.input = [*v1.xyz]
         static_var.output = [
-            f"unit vector of vector1: {to_list_and_round_for_output(unit1)}",
-            f"magnitude of vector1: {to_list_and_round_for_output(mag1)}"
+            f"unit vector of vector1: {make_output_clean(unit1)}",
+            f"magnitude of vector1: {make_output_clean(mag1)}"
         ]
     elif input_type == "two vectors without c" or input_type == "two vectors with c":
         # GET INPUT
-        x2 = float(request.form.get("input_x2")
-                   )if request.form.get("input_x2") else 0
-        y2 = float(request.form.get("input_y2")
-                   )if request.form.get("input_y2") else 0
-        z2 = float(request.form.get("input_z2")
-                   )if request.form.get("input_z2") else 0
+        x2, y2, z2 = ProcessForm.get_form_input(
+            request, ["input_x2", "input_y2", "input_z2"])
         v2 = Vector(x2, y2, z2)
         # do output
         unit2 = v2.unit_vector()
@@ -67,10 +48,7 @@ def process_input(request, input_type):
             v1.set_charge(c1)
             v2.set_charge(c2)
             # do output
-            f = electric_force(v1, v2, v1.charge, v2.charge)
-            e = electrical_field(v1, v2, v1.charge)
-            v = electrical_potential(v1, v2, v1.charge)
-            flux = flux_density(v1, v2, v1.charge)
+
     else:
         return ["Select an input type"], []
     # prepare output
@@ -78,40 +56,36 @@ def process_input(request, input_type):
     if input_type == "two vectors with c":
         static_var.input = [*v1.xyz, v1.charge, *v2.xyz, v2.charge]
         static_var.output = [
-            f"vector2 - vector1: {to_list_and_round_for_output(v12)}",
-            f"vector1 + vector2: {to_list_and_round_for_output(v1.nxyz + v2.nxyz)}",
-            f"magnitude of vector12: {to_list_and_round_for_output(mag)}",
-            f"unit vector of vector12: {to_list_and_round_for_output(unit)}",
-            f"force vector of vector12: {to_list_and_round_for_output(f)}",
-            f"electric field vector of vector12: {to_list_and_round_for_output(e)}",
-            f"potential vector of vector12: {to_list_and_round_for_output(v)}",
-            f"flux vector of vector12: {to_list_and_round_for_output(flux)}",
-            f"cross product vector of vector12: {to_list_and_round_for_output(cross_prod)}",
-            f"dot product vector of vector12: {to_list_and_round_for_output(dot_prod)}",
-            f"unit vector of vector1: {to_list_and_round_for_output(unit1)}",
-            f"unit vector of vector2: {to_list_and_round_for_output(unit2)}",
-            f"magnitude of vector1: {to_list_and_round_for_output(mag1)}",
-            f"magnitude of vector2: {to_list_and_round_for_output(mag2)}"
+            f"vector2 - vector1: {make_output_clean(v12)}",
+            f"vector1 + vector2: {make_output_clean(v1.nxyz + v2.nxyz)}",
+            f"magnitude of vector12: {make_output_clean(mag)}",
+            f"unit vector of vector12: {make_output_clean(unit)}",
+            f"cross product vector of vector12: {make_output_clean(cross_prod)}",
+            f"dot product vector of vector12: {make_output_clean(dot_prod)}",
+            f"unit vector of vector1: {make_output_clean(unit1)}",
+            f"unit vector of vector2: {make_output_clean(unit2)}",
+            f"magnitude of vector1: {make_output_clean(mag1)}",
+            f"magnitude of vector2: {make_output_clean(mag2)}"
         ]
     elif input_type == "two vectors without c":
         static_var.input = [*v1.xyz, *v2.xyz]
         static_var.output = [
-            f"vector2 - vector1: {to_list_and_round_for_output(v12)}",
-            f"vector1 + vector2: {to_list_and_round_for_output(v1.nxyz + v2.nxyz)}",
-            f"magnitude of vector12: {to_list_and_round_for_output(mag)}",
-            f"unit vector of vector12: {to_list_and_round_for_output(unit)}",
-            f"cross product vector of vector12: {to_list_and_round_for_output(cross_prod)}",
-            f"dot product vector of vector12: {to_list_and_round_for_output(dot_prod)}",
-            f"unit vector of vector1: {to_list_and_round_for_output(unit1)}",
-            f"unit vector of vector2: {to_list_and_round_for_output(unit2)}",
-            f"magnitude of vector1: {to_list_and_round_for_output(mag1)}",
-            f"magnitude of vector2: {to_list_and_round_for_output(mag2)}"
+            f"vector2 - vector1: {make_output_clean(v12)}",
+            f"vector1 + vector2: {make_output_clean(v1.nxyz + v2.nxyz)}",
+            f"magnitude of vector12: {make_output_clean(mag)}",
+            f"unit vector of vector12: {make_output_clean(unit)}",
+            f"cross product vector of vector12: {make_output_clean(cross_prod)}",
+            f"dot product vector of vector12: {make_output_clean(dot_prod)}",
+            f"unit vector of vector1: {make_output_clean(unit1)}",
+            f"unit vector of vector2: {make_output_clean(unit2)}",
+            f"magnitude of vector1: {make_output_clean(mag1)}",
+            f"magnitude of vector2: {make_output_clean(mag2)}"
         ]
     elif input_type == "single vector":
         static_var.input = [*v1.xyz]
         static_var.output = [
-            f"unit vector of vector1: {to_list_and_round_for_output(unit1)}",
-            f"magnitude of vector1: {to_list_and_round_for_output(mag1)}"
+            f"unit vector of vector1: {make_output_clean(unit1)}",
+            f"magnitude of vector1: {make_output_clean(mag1)}"
         ]
     else:
         static_var.input = []
@@ -119,7 +93,22 @@ def process_input(request, input_type):
     return static_var.output, static_var.input
 
 
+def compare_text_only(str1, str2):
+    # Remove digits from both strings
+    clean1 = ''.join(char for char in str1 if not char.isdigit())
+    clean2 = ''.join(char for char in str2 if not char.isdigit())
+    return clean1 == clean2
+
+
 class ProcessForm:
+    @staticmethod
+    def get_form_input(request, input_name_list,):
+        input_list = []
+        for name in input_name_list:
+            input_list.append(float(request.form.get(name))
+                              if request.form.get(name) else 0)
+        return input_list
+
     @staticmethod
     def process_form_request_home(request):
         # Sidebar buttons
@@ -140,18 +129,14 @@ class ProcessForm:
                 request, static_var.input_type)
         return static_var.button, static_var.input, static_var.output, static_var.input_type
 
-    @staticmethod
-    def process_form_sketch(request):
+    @classmethod
+    def process_form_sketch(cls, request):
         if "sketch_button" in request.form:  # detect sketch submision
             button = request.form.get("sketch_button")
             if button == "submit":
-                i = float(request.form.get("input_i")
-                          )if request.form.get("input_i") else 0
-                j = float(request.form.get("input_j")
-                          )if request.form.get("input_j") else 0
-                k = float(request.form.get("input_k")
-                          )if request.form.get("input_k") else 0
-                return [i, j, k]
+                op = cls.get_form_input(
+                    request, ["input_i", "input_j", "input_k"])
+                return op
             elif button == "reset":
                 return ["reset"]
         elif "system_type" in request.form:  # detect system type change
@@ -159,3 +144,40 @@ class ProcessForm:
             if system_type in ["cartesian", "cylindrical", "spherical"]:
                 return [system_type]
         return []
+
+    @classmethod
+    def process_form_physics(cls, request):
+        # buttons in source section
+        if "source_charge_button" in request.form:
+            theButton = request.form.get("source_charge_button")
+            if theButton == "add_charge":
+                input_charge = cls.get_form_input(
+                    request, ["charge_value", "x_pos", "y_pos", "z_pos"])
+                dict_charge = physics_applications.Charges(
+                    input_charge).to_dict()
+                return dict_charge, 'dict_input'  # return dict to be added
+            elif theButton == "clear_charges":
+                physics_applications.Session.clear_charges()
+                flash("All charges cleared successfully.")
+                return [], "clear_charges"  # indicate cleared
+
+        # buttons in current charges section
+        elif "current_charges_button" in request.form:
+            theButton = request.form.get("current_charges_button")
+            if compare_text_only(theButton, "remove_charge"):
+                target_id = int(''.join(filter(str.isdigit, theButton)))
+                physics_applications.Session.delete_charge(target_id)
+                flash(f"Charge ID {target_id} removed successfully.")
+                return [], "remove_charge"
+                # finish later
+            elif compare_text_only(theButton, "edit_charge"):
+                pass
+            elif compare_text_only(theButton, "calculate_effect"):
+                target_id = int(''.join(filter(str.isdigit, theButton)))
+                try:
+                    f, e, v = physics_applications.calculate_effect(target_id)
+                    return [f, e, v], "calculate_effect"
+                except Exception as e:
+                    flash(str(e) + " in controllers ")
+
+        return [], None

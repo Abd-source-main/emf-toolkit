@@ -1,30 +1,22 @@
-# for pushing changes to github
-""" 
- git add .
- git commit -m "just shorted the requirment"
- git push origin main
-
 """
-"""
-# for pulling changes from github
-
-cd ~/emf-toolkit
-git fetch origin
-git reset --hard origin/main
+pyinstaller --onefile --noconsole  --add-data "templates;templates" --add-data "static;static" app.py
 
 
 """
+
 
 # Activate virtual environment
 # venv\Scripts\activate
 
 from controllers import ProcessForm, static_var
-from flask import Flask, render_template, request, redirect
+import physics_applications as pa
+from flask import Flask, flash, render_template, request, redirect
 import threading
 from sketch import Sketch_controller
 import webview
 
 app = Flask(__name__)
+app.secret_key = 'ruIUEcBFieu#79407:+34rkd,q'
 sk = Sketch_controller()
 
 
@@ -32,9 +24,16 @@ sk = Sketch_controller()
 def home():
     button, input, output, input_type = ProcessForm.process_form_request_home(
         request)
+
+    """ redirecting """
     if button in ["cartesian", "cylindrical", "spherical"]:
         static_var.button = "home"
         return redirect(f'/{button}_sketch')
+    elif button == "button_three":
+        static_var.button = "home"
+        return redirect("/physics")
+    """ end of redirecting """
+
     return render_template(
         "index.html",
         button_section=button,
@@ -84,14 +83,33 @@ def spherical_sketch():
                            plot_html="<h3>Spherical sketch page under construction.</h3>")
 
 
+@app.route("/physics", methods=["GET", "POST"])
+def button_three():
+    input_charge = None
+    output = None
+    var, action = ProcessForm.process_form_physics(request)
+    if action == 'dict_input':
+        input_charge = var
+        pa.Session.save_charge(input_charge)
+    elif 'calculate_effect':
+        output = var
+    charges = pa.Session.get_charges()
+    return render_template("physics.html", input_charge=input_charge,
+                           charges=charges,
+                           output=output
+                           )
+
+
 def run_flask():
     # IMP:disable debug for production build
     app.run(debug=True, use_reloader=True)
 
 
 if __name__ == "__main__":
+    # uncomment to for final product
     run_flask()
-    # Start Flask in background thread
+
+    # # Start Flask in background thread
     # flask_thread = threading.Thread(target=run_flask)
     # flask_thread.daemon = True
     # flask_thread.start()

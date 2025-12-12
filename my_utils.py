@@ -1,6 +1,47 @@
 import numpy as np
-from math import sqrt
 import math
+
+
+def to_eng(value, precision=3):
+    """
+    Converts a float to a string in engineering notation.
+    """
+    if value == 0:
+        return "0"
+
+    # Calculate power in steps of 3
+    pwr = int(math.floor(math.log10(abs(value)) / 3.0) * 3)
+
+    # Scale the value
+    mantissa = value / (10.0 ** pwr)
+
+    # Suffix dictionary
+    suffixes = {
+        -18: 'a', -15: 'f', -12: 'p', -9: 'n', -6: 'µ', -3: 'm',
+        0: '',
+        3: 'k', 6: 'M', 9: 'G', 12: 'T', 15: 'P', 18: 'E'
+    }
+
+    suffix = suffixes.get(pwr, f"e{pwr}")
+    return f"{mantissa:.{precision}f}{suffix}"
+
+
+def make_output_clean(v):
+    ''' TAKE INPUT v AS Vector, np.array, list, str, or float'''
+    # convert Vector or np.array to a plain list of floats rounded to 3 decimal places
+    if isinstance(v, Vector):
+        return v.get_full_eng()
+    elif isinstance(v, np.ndarray):
+        # unpack NumPy array
+        x, y, z = [float(round(x, 3)) for x in v]
+        return f"<{x}, {y}, {z}>"
+    elif isinstance(v, list):
+        x, y, z = [float(round(x, 3)) for x in v]
+        return f"<{x}, {y}, {z}>"        # unpack list
+    elif isinstance(v, str):
+        return v        # return string as is
+    else:
+        return round(v, 3)  # return float
 
 
 class Vector:
@@ -16,6 +57,22 @@ class Vector:
             return arr.item()  # return as a scalar
         return cls(*var)
 
+    def get_x_eng(self):
+        return to_eng(self.xyz[0])
+
+    def get_y_eng(self):
+        return to_eng(self.xyz[1])
+
+    def get_z_eng(self):
+        return to_eng(self.xyz[2])
+
+    def get_mag_eng(self):
+        return to_eng(self.magnitude())
+
+    def get_full_eng(self):
+        # Returns the whole vector like <10k, 5m, 0>
+        return f"<{self.get_x_eng()}, {self.get_y_eng()}, {self.get_z_eng()}>"
+
     def set_charge(self, q):
         self.charge = q
 
@@ -23,15 +80,11 @@ class Vector:
         return np.linalg.norm(self.xyz)
 
     def unit_vector(self):
-        # avoid division by zero
-        if self.magnitude() == 0:
-            return [0, 0, 0]
+        magnitude = self.magnitude()
+        if magnitude == 0:
+            return Vector(0, 0, 0)
         else:
-            return self.convert_to_vector(self.nxyz/self.magnitude())
-
-
-k = 8.99 * (10 ** 9)  # coloumb's constant
-E0 = 8.854 * (10 ** -12)  # permittivity of free space
+            return self.convert_to_vector(self.nxyz / magnitude)
 
 
 def cross(v1, v2):
@@ -43,41 +96,7 @@ def dot(v1, v2):
 
 
 def vector_12(v1, v2):
-    return Vector.convert_to_vector(np.array(v2.nxyz) - np.array(v1.nxyz))
-
-
-# vector
-def electric_force(v1, v2, q1, q2):
-    # r is a vector
-    r = vector_12(v1, v2)
-    scaler = (k * q1 * q2) / (r.magnitude() ** 3) if r.magnitude() != 0 else 0
-    # F = (k * q1*q2 / |r^3| ) * v12
-    force = scaler * r.nxyz if r.magnitude() != 0 else 'can NOT divide by zero'
-    return Vector.convert_to_vector(force)
-
-
-# vector
-def electrical_field(v1, v2, q1):
-    # E = F/q2 (when q2 = 1 --> E = F)
-    E = electric_force(v1, v2, q1, 1)
-    return E
-
-
-# scalar
-def electrical_potential(v1, v2, q1):
-    r = vector_12(v1, v2).magnitude()
-    # V = k * q1 / r
-    v = (k*q1) / r if r != 0 else 0
-    return v
-
-
-# vector
-def flux_density(v1, v2, q1, Er=1):
-    # Er is relative permittivity
-    # D = Er * E0 * electric_field
-    D = Er * E0 * electrical_field(v1, v2, q1).nxyz if isinstance(
-        electrical_field(v1, v2, q1), Vector) else 'can NOT divide by zero'
-    return D
+    return Vector.convert_to_vector(np.array(v1.nxyz) - np.array(v2.nxyz))
 
 
 class CoordinateConverter:

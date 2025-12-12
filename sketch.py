@@ -106,24 +106,34 @@ class Sketch_element:
     def sketch_unit_vectors(larger_i, larger_j, larger_k, config, system="cartesian"):
         if system == "cartesian":
             unit_names = ["x-axis", "y-axis", "z-axis"]
+            unitVectors = [
+                {"start": (0, 0, 0), "end": (larger_i, 0, 0),
+                 "name": unit_names[0]},
+                {"start": (0, 0, 0), "end": (0, larger_j, 0),
+                 "name": unit_names[1]},
+                {"start": (0, 0, 0), "end": (0, 0, larger_k),
+                 "name": unit_names[2]},
+                {"start": (0, 0, 0), "end": (-larger_i, 0, 0),
+                 "name": f"negative {unit_names[0]}"},
+                {"start": (0, 0, 0), "end": (0, -larger_j, 0),
+                 "name": f"negative {unit_names[1]}"},
+                {"start": (0, 0, 0), "end": (0, 0, -larger_k),
+                 "name": f"negative {unit_names[2]}"}
+            ]
         elif system == "cylindrical":
             unit_names = ["ρ-axis", "φ-axis", "z-axis"]
+            unitVectors = [
+                {"start": (0, 0, 0), "end": (larger_i, 0, 0),
+                 "name": unit_names[0]},
+                {"start": (0, 0, 0), "end": (0, 0, larger_k),
+                 "name": unit_names[2]},
+                {"start": (0, 0, 0), "end": (0, 0, -larger_k),
+                 "name": f"negative {unit_names[2]}"}
+            ]
         else:
+            # not coded yet
             unit_names = ["r-axis", "θ-axis", "φ-axis"]
-        unitVectors = [
-            {"start": (0, 0, 0), "end": (larger_i, 0, 0),
-                "name": unit_names[0]},
-            {"start": (0, 0, 0), "end": (0, larger_j, 0),
-                "name": unit_names[1]},
-            {"start": (0, 0, 0), "end": (0, 0, larger_k),
-                "name": unit_names[2]},
-            {"start": (0, 0, 0), "end": (-larger_i, 0, 0),
-                "name": f"negative {unit_names[0]}"},
-            {"start": (0, 0, 0), "end": (0, -larger_j, 0),
-                "name": f"negative {unit_names[1]}"},
-            {"start": (0, 0, 0), "end": (0, 0, -larger_k),
-                "name": f"negative {unit_names[2]}"}
-        ]
+            unitVectors = []
         # sketch origin point
         config.add_trace(go.Scatter3d(
             x=[0],
@@ -151,8 +161,12 @@ class Sketch_element:
     @staticmethod
     def sketch_grid_lines(larger_i, larger_j, config):
         """ sketch grid lines between an axis (i) and another axis (j) """
-        x_points = np.linspace(larger_i, -larger_i, 10)
-        y_points = np.linspace(larger_j, -larger_j, 10)
+        if not isinstance(larger_i, np.ndarray) and not isinstance(larger_j, np.ndarray):
+            x_points = np.linspace(larger_i, -larger_i, 10)
+            y_points = np.linspace(larger_j, -larger_j, 10)
+        else:
+            x_points = larger_i
+            y_points = larger_j
         for x in x_points:
             config.add_trace(go.Scatter3d(
                 x=[x, x],
@@ -203,7 +217,7 @@ class Sketch_element:
             mode='lines',
             line=dict(width=size, color='blue'),
             name=f'circle-r{radius}',
-            showlegend=True
+            showlegend=False
         ))
 
     @staticmethod
@@ -222,7 +236,7 @@ class Sketch_element:
             mode='lines',
             line=dict(width=size, color='blue'),
             name=f'cylinder-r{rho}',
-            showlegend=True
+            showlegend=False
         ))
         config.add_trace(go.Scatter3d(
             x=[x, x],
@@ -231,7 +245,7 @@ class Sketch_element:
             mode='lines',
             line=dict(width=size, color='blue'),
             name=f'cylinder-r{rho}',
-            showlegend=True
+            showlegend=False
         ))
         # sketch top/bottom lines at the ending phi
         config.add_trace(go.Scatter3d(
@@ -241,7 +255,7 @@ class Sketch_element:
             mode='lines',
             line=dict(width=size, color='blue'),
             name=f'cylinder-r{rho}',
-            showlegend=True
+            showlegend=False
         ))
         config.add_trace(go.Scatter3d(
             x=[0, x],
@@ -250,7 +264,7 @@ class Sketch_element:
             mode='lines',
             line=dict(width=size, color='blue'),
             name=f'cylinder-r{rho}',
-            showlegend=True
+            showlegend=False
         ))
         # sketch top/bottom lines at the starting phi=0
         config.add_trace(go.Scatter3d(
@@ -260,7 +274,7 @@ class Sketch_element:
             mode='lines',
             line=dict(width=size, color='blue'),
             name=f'cylinder-r{rho}',
-            showlegend=True
+            showlegend=False
         ))
         config.add_trace(go.Scatter3d(
             x=[0, rho],
@@ -269,8 +283,13 @@ class Sketch_element:
             mode='lines',
             line=dict(width=size, color='blue'),
             name=f'cylinder-r{rho}',
-            showlegend=True
+            showlegend=False
         ))
+        # sketch grid lines on top and bottom circles
+        theta = np.linspace(0, phi, 10)
+        x = np.cos(theta) * rho
+        y = np.sin(theta) * rho
+        Sketch_element.sketch_grid_lines(x, y, config)
 
 
 class Sketch_plane:
@@ -490,6 +509,13 @@ class Sketch_cylindrical(Sketch_plane):
         # iykyk
         vector = [float(x) for x in strdata]
         if vector and len(vector) > 1:  # avoid index error
+            if vector[0] < 0:
+                vector[0] = abs(vector[0])
+                vector[1] = vector[1] + 180
+            while vector[1] > 360:
+                vector[1] -= 360
+            while vector[1] < 0:
+                vector[1] += 360
             vector[1] = vector[1] * (np.pi / 180)  # convert phi to radians
         if vector:
             self.larger_rho = max(abs(vector[0]), abs(self.larger_rho))
