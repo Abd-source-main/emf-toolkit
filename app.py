@@ -12,12 +12,30 @@ from controllers import ProcessForm, static_var
 import physics_applications as pa
 from flask import Flask, flash, render_template, request, redirect
 import threading
-from sketch import Sketch_controller
+from sketch import Sketch_controller, Sketch_charge
 import webview
+import sys
+import os
 
-app = Flask(__name__)
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
+app = Flask(__name__,
+            template_folder=resource_path('templates'),
+            static_folder=resource_path('static'))
+
 app.secret_key = 'ruIUEcBFieu#79407:+34rkd,q'
 sk = Sketch_controller()
+skc = Sketch_charge()
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -87,6 +105,7 @@ def spherical_sketch():
 def button_three():
     input_charge = None
     output = None
+    plot_html = "enter charges to be sketch"
     var, action = ProcessForm.process_form_physics(request)
     if action == 'dict_input':
         input_charge = var
@@ -94,9 +113,12 @@ def button_three():
     elif 'calculate_effect':
         output = var
     charges = pa.Session.get_charges()
+    skc.readd_charges(charges)
+    plot_html = skc.sketch()
     return render_template("physics.html", input_charge=input_charge,
                            charges=charges,
-                           output=output
+                           output=output,
+                           plot_html=plot_html
                            )
 
 

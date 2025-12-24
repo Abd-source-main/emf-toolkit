@@ -28,10 +28,55 @@ class Vector_colors:
 
 
 class Sketch_element:
+
+    @classmethod
+    def sketch_charge(cls, config, charge, offset, size=5):
+        """ take charge dict then plot it"""
+        position = charge["x_pos"], charge["y_pos"], charge["z_pos"]
+        x, y, z = position
+        charge_value = charge["charge_value"]
+        charge_color = 'red' if charge_value > 0 else 'blue' if charge_value < 0 else 'green'
+        config.add_trace(go.Scatter3d(
+            x=[x],
+            y=[y],
+            z=[z],
+            mode='markers',
+            marker=dict(size=size, color=charge_color),
+            name=f'Charge {charge["id"]}',
+            showlegend=True
+        ))
+        if charge_value == 0:
+            return
+        offset = offset
+        arrows = {
+            'x_arrow': {
+                "start": (x - offset, y, z),
+                "end": (x + offset, y, z),
+                "name": f'Charge {charge["id"]}',
+                "color": charge_color
+            },
+            'y_arrow': {
+                "start": (x, y - offset, z),
+                "end": (x, y + offset, z),
+                "name": f'Charge {charge["id"]}',
+                "color": charge_color
+            },
+            'z_arrow': {
+                "start": (x, y, z - offset),
+                "end": (x, y, z + offset),
+                "name": f'Charge {charge["id"]}',
+                "color": charge_color
+            }
+        }
+        for arrow in arrows.values():
+            cls.sketch_cartesian_vector(
+                arrow, config, showlegend=False, opticity=0.5, is_line=True, size=size)
+
     # data must be a list of dictionaries with start and end points
     # with name and optional size
+
     @staticmethod
-    def sketch_cartesian_vector(vec, config, size=8):
+    def sketch_cartesian_vector(vec, config, size=8, showlegend=True, opticity=1.0, is_line=False):
         x0, y0, z0 = vec["start"]
         x1, y1, z1 = vec["end"]
         vec_name = vec["name"]
@@ -45,27 +90,29 @@ class Sketch_element:
             line=dict(width=size, color=vec_color),
             name=vec_name,
             legendgroup=vec_name,
-            showlegend=True
+            showlegend=showlegend,
+            opacity=opticity
         ))
-
-        config.add_trace(go.Cone(x=[x1], y=[y1],
-                                 z=[z1],
-                                 u=[x1 - x0],
-                                 v=[y1 - y0],
-                                 w=[z1 - z0],
-                                 sizemode="absolute",
-                                 sizeref=0.2,
-                                 anchor="tip",
-                                 showscale=False,
-                                 colorscale=[
-                                          [0, vec_color], [1, vec_color]],
-                                 legendgroup=vec_name,
-                                 showlegend=False
-                                 ))
+        if not is_line:
+            config.add_trace(go.Cone(x=[x1], y=[y1],
+                                     z=[z1],
+                                     u=[x1 - x0],
+                                     v=[y1 - y0],
+                                     w=[z1 - z0],
+                                     sizemode="absolute",
+                                     sizeref=0.2,
+                                     anchor="tip",
+                                     showscale=False,
+                                     colorscale=[
+                [0, vec_color], [1, vec_color]],
+                legendgroup=vec_name,
+                showlegend=False,
+                opacity=opticity
+            ))
 
     @staticmethod
     def sketch_cylindrical_vector(vec, config, size=8):
-        r, phi, z = vec["start"]
+        r, phi, z = vec["start"]  # maybe here is the problem
         r_end, phi_end, z_end = vec["end"]
         vec_name = vec["name"]
         vec_color = vec["color"] if "color" in vec else "blue"
@@ -298,6 +345,19 @@ class Sketch_plane:
     xyz_vectors = []
     ppz_vectors = []
     rtp_vectors = []
+    charges = []  # list of charge dict
+
+    @classmethod
+    def add_charge(cls, dict_charge):
+        cls.charges.append(dict_charge)
+
+    @classmethod
+    def clear_charges(cls):
+        cls.charges.clear()
+
+    @classmethod
+    def clear_Acharge_by_id(cls, id):
+        cls.charges.pop(id - 1)
 
     def add_input_vector(self, vector, system, config):
         # define inputed vector
@@ -426,23 +486,32 @@ class Sketch_cartesian(Sketch_plane):
     def __init__(self):
         self.reinitialize_cartesian(is_like_first_time=True)
 
+    def get_fig(self):
+        return self.fig
+
     def reinitialize_cartesian(self, is_like_first_time=True):
         self.fig = go.Figure()
         if is_like_first_time:
             self.reset_sketch()
             self.larger_z = self.larger_y = self.larger_x = 1
 
-    def create_cartesian_sketch(self, strdata=[]):
+    def create_cartesian_sketch(self, strdata=None, largest_axis=None, is_charge=False):
         self.reinitialize_cartesian(is_like_first_time=False)
+        if not strdata:
+            strdata = []
+        if not largest_axis:
+            largest_axis = []
         # add the axes x,y,z
         # iykyk
-        vector = [float(x) for x in strdata]
-        if vector:
-            self.larger_x = abs(vector[0]) if abs(vector[0]) > abs(
+
+        position = [float(x) for x in strdata]
+        if position or largest_axis:
+            comp = position or largest_axis
+            self.larger_x = abs(comp[0]) if abs(comp[0]) > abs(
                 self.larger_x) else self.larger_x
-            self.larger_y = abs(vector[1]) if abs(vector[1]) > abs(
+            self.larger_y = abs(comp[1]) if abs(comp[1]) > abs(
                 self.larger_y) else self.larger_y
-            self.larger_z = abs(vector[2]) if abs(vector[2]) > abs(
+            self.larger_z = abs(comp[2]) if abs(comp[2]) > abs(
                 self.larger_z) else self.larger_z
         # sketch unit vectors
         Sketch_element.sketch_unit_vectors(
@@ -471,18 +540,26 @@ class Sketch_cartesian(Sketch_plane):
             height=None,
         )
     # if it was called for only the axises
-        if not vector or vector[0] == vector[1] == vector[2] == 0:
-            # re sketch every inputed vector
-            for i in self.xyz_vectors:
-                Sketch_element.sketch_cartesian_vector(i, config=self.fig)
-            return self.fig.to_html(
-                full_html=False, include_plotlyjs=True, config={"responsive": True})
+        if not position or position[0] == position[1] == position[2] == 0:
+            # re sketch every inputed vector or charge
+            if is_charge:
+                for i in self.charges:
+                    Sketch_element.sketch_charge(
+                        config=self.fig, charge=i, offset=0.2)
+                return self.fig.to_html(
+                    full_html=False, include_plotlyjs=True, config={"responsive": True})
+
+            else:
+                for i in self.xyz_vectors:
+                    Sketch_element.sketch_cartesian_vector(i, config=self.fig)
+                return self.fig.to_html(
+                    full_html=False, include_plotlyjs=True, config={"responsive": True})
 
         # add the input vector data must be 3
-        if not len(vector) == 3:
+        if not len(position) == 3:
             return "<h>There was somthing wrong with the input data" \
                 "it should be 3</h>"
-        super().add_input_vector(vector, system="cartesian", config=self.fig)
+        super().add_input_vector(position, system="cartesian", config=self.fig)
 
         # Convert figure to HTML
         plot_html = self.fig.to_html(
@@ -583,6 +660,38 @@ class Sketch_spherical(Sketch_plane):
         if is_like_first_time:
             self.reset_sketch()
             self.larger_r = self.larger_theta = self.larger_phi = 1
+
+
+class Sketch_charge(Sketch_cartesian):
+    def __init__(self):
+        super().__init__()
+
+    def readd_charges(self, charge_objs):
+        """ clear all saved charges then re save them as dics"""
+        self.clear_charges()
+        for i in charge_objs:
+            self.add_charge(i.to_dict())
+
+    def find_larger_coords(self):
+        if not self.charges:
+            return 1, 1, 1  # Default size
+
+        all_x_values = [abs(charge['x_pos']) for charge in self.charges]
+        all_y_values = [abs(charge['y_pos']) for charge in self.charges]
+        all_z_values = [abs(charge['z_pos']) for charge in self.charges]
+
+        max_x = max(all_x_values)
+        max_y = max(all_y_values)
+        max_z = max(all_z_values)
+
+        return [max_x, max_y, max_z]
+
+    def sketch(self):
+        """ sketch all saved charges"""
+        largest_axis = self.find_larger_coords()
+        plot_html = super().create_cartesian_sketch(
+            largest_axis=largest_axis, is_charge=True)
+        return plot_html
 
 
 class Sketch_controller(Sketch_cartesian, Sketch_cylindrical, Sketch_spherical):

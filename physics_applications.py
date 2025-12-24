@@ -42,44 +42,52 @@ class Charges:
         }
         return dict_charge
 
+    def to_list4sketch(self):
+        return [self.x_pos, self.y_pos, self.z_pos]
+
 
 class physical_quantity_calculation:
     @staticmethod
-    # vector
     def electric_force(v1, v2, q1, q2):
         # r is a vector
         r = vector_12(v1, v2)
-        scaler = (k * q1 * q2) / (r.magnitude() **
-                                  3) if r.magnitude() != 0 else 0
+        mag = r.magnitude()
+
+        if mag == 0:
+            flash(
+                "Calculated Force: Division by zero encountered (charges overlap). Returning zero vector")
+            return Vector(0, 0, 0)
+
         # F = (k * q1*q2 / |r^3| ) * v12
-        force = scaler * r.nxyz if r.magnitude() != 0 else 'can NOT divide by zero'
+        scaler = (k * q1 * q2) / (mag ** 3)
+        force = scaler * r.nxyz
         return Vector.convert_to_vector(force)
 
     @classmethod
-    # vector
     def electrical_field(cls, v1, v2, q1):
         # E = F/q2 (when q2 = 1 --> E = F)
+        # This calls electric_force, so the zero-check and flash are handled there.
         E = cls.electric_force(v1, v2, q1, 1)
         return E
 
     @staticmethod
-    # scalar
     def electrical_potential(v1, v2, q1):
         r = vector_12(v1, v2).magnitude()
+
+        if r == 0:
+            flash("Calculated Potential: Division by zero encountered. Returning 0.")
+            return 0.0
+
         # V = k * q1 / r
-        v = (k*q1) / r if r != 0 else 0
+        v = (k * q1) / r
         return v
 
     @classmethod
-    # not in use currently
-    # vector
     def flux_density(cls, v1, v2, q1, Er=1):
         # Er is relative permittivity
         # D = Er * E0 * electric_field
         electric_field = cls.electrical_field(v1, v2, q1)
-        D = Vector.convert_to_vector(Er * E0 * electric_field.nxyz)if isinstance(
-            electric_field, Vector) else 'can NOT divide by zero'
-        D = Vector.convert_to_vector(D) if not isinstance(D, str) else D
+        D = Vector.convert_to_vector(Er * E0 * electric_field.nxyz)
         return D
 
 

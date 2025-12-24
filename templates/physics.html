@@ -173,7 +173,9 @@
 
             <div class="visualization">
                 <div class="canvas-container">
-                    <canvas id="field-visualization"></canvas>
+                    <div id="field-visualization" style="width: 100%; height: 100%;">
+                        {{ plot_html | safe }}
+                    </div>
                 </div>
             </div>
         </div>
