@@ -10,7 +10,7 @@ class static_var:
     input_type = "two vectors with c"
 
 
-def to_list_and_round_for_output(v):
+def make_output_clean(v):
     # convert Vector or np.array to a plain list of floats rounded to 3 decimal places
     if isinstance(v, Vector):
         return [float(round(x, 3)) for x in v.xyz]   # unpack Vector
@@ -37,8 +37,8 @@ def process_input(request, input_type):
     if input_type == "single vector":
         static_var.input = [*v1.xyz]
         static_var.output = [
-            f"unit vector of vector1: {to_list_and_round_for_output(unit1)}",
-            f"magnitude of vector1: {to_list_and_round_for_output(mag1)}"
+            f"unit vector of vector1: {make_output_clean(unit1)}",
+            f"magnitude of vector1: {make_output_clean(mag1)}"
         ]
     elif input_type == "two vectors without c" or input_type == "two vectors with c":
         # GET INPUT
@@ -78,40 +78,40 @@ def process_input(request, input_type):
     if input_type == "two vectors with c":
         static_var.input = [*v1.xyz, v1.charge, *v2.xyz, v2.charge]
         static_var.output = [
-            f"vector2 - vector1: {to_list_and_round_for_output(v12)}",
-            f"vector1 + vector2: {to_list_and_round_for_output(v1.nxyz + v2.nxyz)}",
-            f"magnitude of vector12: {to_list_and_round_for_output(mag)}",
-            f"unit vector of vector12: {to_list_and_round_for_output(unit)}",
-            f"force vector of vector12: {to_list_and_round_for_output(f)}",
-            f"electric field vector of vector12: {to_list_and_round_for_output(e)}",
-            f"potential vector of vector12: {to_list_and_round_for_output(v)}",
-            f"flux vector of vector12: {to_list_and_round_for_output(flux)}",
-            f"cross product vector of vector12: {to_list_and_round_for_output(cross_prod)}",
-            f"dot product vector of vector12: {to_list_and_round_for_output(dot_prod)}",
-            f"unit vector of vector1: {to_list_and_round_for_output(unit1)}",
-            f"unit vector of vector2: {to_list_and_round_for_output(unit2)}",
-            f"magnitude of vector1: {to_list_and_round_for_output(mag1)}",
-            f"magnitude of vector2: {to_list_and_round_for_output(mag2)}"
+            f"vector2 - vector1: {make_output_clean(v12)}",
+            f"vector1 + vector2: {make_output_clean(v1.nxyz + v2.nxyz)}",
+            f"magnitude of vector12: {make_output_clean(mag)}",
+            f"unit vector of vector12: {make_output_clean(unit)}",
+            f"force vector of vector12: {make_output_clean(f)}",
+            f"electric field vector of vector12: {make_output_clean(e)}",
+            f"potential vector of vector12: {make_output_clean(v)}",
+            f"flux vector of vector12: {make_output_clean(flux)}",
+            f"cross product vector of vector12: {make_output_clean(cross_prod)}",
+            f"dot product vector of vector12: {make_output_clean(dot_prod)}",
+            f"unit vector of vector1: {make_output_clean(unit1)}",
+            f"unit vector of vector2: {make_output_clean(unit2)}",
+            f"magnitude of vector1: {make_output_clean(mag1)}",
+            f"magnitude of vector2: {make_output_clean(mag2)}"
         ]
     elif input_type == "two vectors without c":
         static_var.input = [*v1.xyz, *v2.xyz]
         static_var.output = [
-            f"vector2 - vector1: {to_list_and_round_for_output(v12)}",
-            f"vector1 + vector2: {to_list_and_round_for_output(v1.nxyz + v2.nxyz)}",
-            f"magnitude of vector12: {to_list_and_round_for_output(mag)}",
-            f"unit vector of vector12: {to_list_and_round_for_output(unit)}",
-            f"cross product vector of vector12: {to_list_and_round_for_output(cross_prod)}",
-            f"dot product vector of vector12: {to_list_and_round_for_output(dot_prod)}",
-            f"unit vector of vector1: {to_list_and_round_for_output(unit1)}",
-            f"unit vector of vector2: {to_list_and_round_for_output(unit2)}",
-            f"magnitude of vector1: {to_list_and_round_for_output(mag1)}",
-            f"magnitude of vector2: {to_list_and_round_for_output(mag2)}"
+            f"vector2 - vector1: {make_output_clean(v12)}",
+            f"vector1 + vector2: {make_output_clean(v1.nxyz + v2.nxyz)}",
+            f"magnitude of vector12: {make_output_clean(mag)}",
+            f"unit vector of vector12: {make_output_clean(unit)}",
+            f"cross product vector of vector12: {make_output_clean(cross_prod)}",
+            f"dot product vector of vector12: {make_output_clean(dot_prod)}",
+            f"unit vector of vector1: {make_output_clean(unit1)}",
+            f"unit vector of vector2: {make_output_clean(unit2)}",
+            f"magnitude of vector1: {make_output_clean(mag1)}",
+            f"magnitude of vector2: {make_output_clean(mag2)}"
         ]
     elif input_type == "single vector":
         static_var.input = [*v1.xyz]
         static_var.output = [
-            f"unit vector of vector1: {to_list_and_round_for_output(unit1)}",
-            f"magnitude of vector1: {to_list_and_round_for_output(mag1)}"
+            f"unit vector of vector1: {make_output_clean(unit1)}",
+            f"magnitude of vector1: {make_output_clean(mag1)}"
         ]
     else:
         static_var.input = []
