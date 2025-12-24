@@ -1,7 +1,7 @@
 # for pushing changes to github
 """ 
  git add .
- git commit -m "add charge description to output and remove js code"
+ git commit -m "just shorted the requirment"
  git push origin main
 
 """
@@ -18,40 +18,70 @@ git reset --hard origin/main
 # Activate virtual environment
 # venv\Scripts\activate
 
-from flask import Flask, render_template, request
+from controllers import ProcessForm, static_var
+from flask import Flask, render_template, request, redirect
 import threading
+from sketch import Sketch_controller
 import webview
-from controllers import process_input, static_var
+
 app = Flask(__name__)
+sk = Sketch_controller()
 
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-    if request.method == "POST":
-        # Sidebar buttons
-        if "button" in request.form:
-            btn = request.form.get("button")
-            static_var.button = btn if btn in [
-                "button_one", "button_two", "button_three"] else "Unknown button"
-
-        # Input type select
-        elif "input_type" in request.form:
-            input_type = request.form.get("input_type")
-            static_var.input_type = input_type if input_type in [
-                "two vectors with c", "two vectors without c", "single vector"] else "two vectors with c"
-
-        # Vector input fields
-        elif "input_x1" in request.form:  # detect vector submission
-            static_var.output, static_var.input = process_input(
-                request, static_var.input_type)
-
+    button, input, output, input_type = ProcessForm.process_form_request_home(
+        request)
+    if button in ["cartesian", "cylindrical", "spherical"]:
+        static_var.button = "home"
+        return redirect(f'/{button}_sketch')
     return render_template(
         "index.html",
-        button_section=static_var.button,
-        input_to_jinja=static_var.input,
-        output_to_jinja=static_var.output,
-        input_type=static_var.input_type
+        button_section=button,
+        input_to_jinja=input,
+        output_to_jinja=output,
+        input_type=input_type,
     )
+
+
+@app.route("/cartesian_sketch", methods=["GET", "POST"])
+def cartesian_sketch():
+    global sk
+    data = ProcessForm.process_form_sketch(request)
+    if data == ["reset"]:
+        sk.reinitialize_cartesian(is_like_first_time=True)
+        data.clear()
+    elif data and data[0] in ["cartesian", "cylindrical", "spherical"]:
+        return redirect(f'/{data[0]}_sketch')
+    plot_html = sk.create_cartesian_sketch(strdata=data)
+    return render_template("sketch.html",
+                           system="cartesian",
+                           plot_html=plot_html)
+
+
+@app.route("/cylindrical_sketch", methods=["GET", "POST"])
+def cylindrical_sketch():
+    data = ProcessForm.process_form_sketch(request)
+    if data == ["reset"]:
+        sk.reinitialize_cylindrical(is_like_first_time=True)
+        data.clear()
+    if data and data[0] in ["cartesian", "cylindrical", "spherical"]:
+        return redirect(f'/{data[0]}_sketch')
+    plot_html = sk.create_cylindrical_sketch(strdata=data)
+    return render_template("sketch.html",
+                           system="cylindrical",
+                           plot_html=plot_html)
+
+
+@app.route("/spherical_sketch", methods=["GET", "POST"])
+def spherical_sketch():
+    data = ProcessForm.process_form_sketch(request)
+
+    if data and data[0] in ["cartesian", "cylindrical", "spherical"]:
+        return redirect(f'/{data[0]}_sketch')
+    return render_template("sketch.html",
+                           system="spherical",
+                           plot_html="<h3>Spherical sketch page under construction.</h3>")
 
 
 def run_flask():
@@ -60,9 +90,8 @@ def run_flask():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host='127.0.0.1', port=5000)
-
-    # # Start Flask in background thread
+    run_flask()
+    # Start Flask in background thread
     # flask_thread = threading.Thread(target=run_flask)
     # flask_thread.daemon = True
     # flask_thread.start()

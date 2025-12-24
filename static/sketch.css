@@ -1,0 +1,126 @@
+/* ===== Base ===== */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Patrick Hand', cursive;
+    background-color: #F8F9F4;
+    color: #2E2E2E;
+    height: 100%;
+    overflow-y: auto;
+    /* allow scrolling */
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== Form Card ===== */
+.input-card {
+    background: #FFFFFF;
+    padding: 20px;
+    margin: 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.input-card h2 {
+    margin-top: 0px;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    color: #525743;
+    margin-bottom: 10px;
+}
+
+/* Vector input group */
+.vector-input-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.vector-input-group input,
+select {
+    width: 80px;
+    padding: 8px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+/* Buttons */
+button[type="submit"] {
+    background: #525743;
+    color: #FAFAFA;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+button[type="submit"]:hover {
+    background: #748464;
+}
+
+/* ===== Plot Wrapper ===== */
+#plot-wrapper {
+    flex: 1;
+    width: 100%;
+    min-height: 400px;
+    max-height: 90vh;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow: auto;
+    /* scroll if content is too tall */
+}
+
+#plot-wrapper>div {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .input-card {
+        margin: 10px;
+        padding: 16px;
+    }
+
+    #plot-wrapper {
+        min-height: 300px;
+    }
+
+    .vector-input-group input,
+    select {
+        width: 60px;
+        font-size: 14px;
+    }
+
+    button[type="submit"] {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .input-card {
+        margin: 8px;
+        padding: 12px;
+    }
+
+    #plot-wrapper {
+        min-height: 250px;
+    }
+
+    .vector-input-group input,
+    select {
+        width: 50px;
+        font-size: 13px;
+    }
+}

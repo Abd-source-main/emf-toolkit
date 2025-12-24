@@ -1,8 +1,8 @@
 from my_utils import *
-from flask import Flask, render_template, request
-
 
 # To have similar to a static variable in c++
+
+
 class static_var:
     button = "home"
     output = []
@@ -117,3 +117,45 @@ def process_input(request, input_type):
         static_var.input = []
         static_var.output = ["Select an input type"]
     return static_var.output, static_var.input
+
+
+class ProcessForm:
+    @staticmethod
+    def process_form_request_home(request):
+        # Sidebar buttons
+        if "button" in request.form:
+            btn = request.form.get("button")
+            static_var.button = btn if btn in [
+                "button_one", "cartesian", "cylindrical", "spherical", "button_three"] else "home"
+
+        # Input type select
+        if "input_type" in request.form:
+            input_type = request.form.get("input_type")
+            static_var.input_type = input_type if input_type in [
+                "two vectors with c", "two vectors without c", "single vector"] else "single vector"
+
+        # Vector input fields
+        if "input_x1" in request.form:  # detect vector submission
+            static_var.output, static_var.input = process_input(
+                request, static_var.input_type)
+        return static_var.button, static_var.input, static_var.output, static_var.input_type
+
+    @staticmethod
+    def process_form_sketch(request):
+        if "sketch_button" in request.form:  # detect sketch submision
+            button = request.form.get("sketch_button")
+            if button == "submit":
+                i = float(request.form.get("input_i")
+                          )if request.form.get("input_i") else 0
+                j = float(request.form.get("input_j")
+                          )if request.form.get("input_j") else 0
+                k = float(request.form.get("input_k")
+                          )if request.form.get("input_k") else 0
+                return [i, j, k]
+            elif button == "reset":
+                return ["reset"]
+        elif "system_type" in request.form:  # detect system type change
+            system_type = request.form.get("system_type")
+            if system_type in ["cartesian", "cylindrical", "spherical"]:
+                return [system_type]
+        return []
