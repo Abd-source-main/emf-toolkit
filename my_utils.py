@@ -2,6 +2,15 @@ import numpy as np
 import math
 
 
+def is_number(string):
+    """ check if str can turn to float"""
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
+
+
 def to_eng(value, precision=3):
     """
     Converts a float to a string in engineering notation.
@@ -23,7 +32,7 @@ def to_eng(value, precision=3):
     }
 
     suffix = suffixes.get(pwr, f"e{pwr}")
-    return f"{mantissa:.{precision}f}{suffix}"
+    return f"{mantissa:.{precision}f} {suffix}"
 
 
 def make_output_clean(v):

@@ -1,6 +1,7 @@
 from flask import flash
 from my_utils import *
 import physics_applications
+from lamdas import CalcChargeFromLamdas
 
 
 # To have similar to a static variable in c++
@@ -110,12 +111,88 @@ class ProcessForm:
         return input_list
 
     @staticmethod
+    def process_distribution_request(request):
+        """
+        Handles the logic for the 'Distribution Charged' form.
+        Calculates Total Charge using Symbolic Integration via lamdas.py.
+        """
+        try:
+            # 1. Extract Global Options
+            sys_opt = request.form.get('sys_opt', 'sys-cart')
+            # lam_opt is used for display purposes
+            lam_opt = request.form.get('lam_opt', 'opt-lam-line')
+
+            density_expr = request.form.get('lambda_val')
+            if not density_expr:
+                return "Error: Density value/expression is required."
+
+            # 2. Setup Coordinate Definitions (Vars and H-factors)
+            coords = []
+            h_factors = []  # Stored as strings for sympy string injection
+
+            """angles should be in rads"""
+            if sys_opt == 'sys-cart':
+                coords = ['x', 'y', 'z']
+                h_factors = ['1', '1', '1']
+            elif sys_opt == 'sys-cyl':
+                coords = ['rho', 'phi', 'z']
+                h_factors = ['1', 'rho', '1']
+            elif sys_opt == 'sys-sph':
+                coords = ['r', 'theta', 'phi']
+                h_factors = ['1', 'r', 'r*sin(theta)']
+
+            # 3. Process Dimensions
+            active_vars = []
+            active_lowers = []
+            active_uppers = []
+            fixed_subs = {}
+
+            # Identify fixed variables and variables of integration
+            for i in range(3):  # 0, 1, 2
+                # Form  are 1-based (src_1, src_2, src_3)
+                form_idx = i + 1
+                var_name = coords[i]
+                is_var = request.form.get(
+                    f"is_var_{form_idx}") is not None    # Return True/False
+
+                if is_var:
+                    # It's an integration variable
+                    start_val = request.form.get(f"src_{form_idx}_start", '0')
+                    end_val = request.form.get(f"src_{form_idx}_end", '0')
+                    active_vars.append(var_name)
+                    active_lowers.append(str(start_val))
+                    active_uppers.append(str(end_val))
+                else:
+                    # It's a constant parameter
+                    fixed_val = float(request.form.get(
+                        f"src_{form_idx}_fixed", 0))
+                    fixed_subs[var_name] = str(fixed_val)
+
+            # 4. Call lamdas.py to handle h-factor construction and integration
+            result = CalcChargeFromLamdas.calculate_total_charge(
+                density_expr, coords, h_factors, active_vars, active_lowers, active_uppers, fixed_subs
+            )
+
+            if result is None:
+                return "Calculation Failed (Check expression syntax)"
+
+            # 5. Format Output
+            # convert to eng if possible
+            if is_number(result):
+                return f"{to_eng(float(result))} C"
+            else:
+                return f"{result} C"
+
+        except Exception as e:
+            return f"Calculation Error: {str(e)}"
+
+    @staticmethod
     def process_form_request_home(request):
         # Sidebar buttons
         if "button" in request.form:
             btn = request.form.get("button")
             static_var.button = btn if btn in [
-                "button_one", "cartesian", "cylindrical", "spherical", "button_three"] else "home"
+                "button_one", "cartesian", "cylindrical", "spherical", "button_three", "button_four"] else "home"
 
         # Input type select
         if "input_type" in request.form:

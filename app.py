@@ -50,6 +50,9 @@ def home():
     elif button == "button_three":
         static_var.button = "home"
         return redirect("/physics")
+    elif button == "button_four":
+        static_var.button = "home"
+        return redirect("/distibution_charges")
     """ end of redirecting """
 
     return render_template(
@@ -120,6 +123,15 @@ def button_three():
                            output=output,
                            plot_html=plot_html
                            )
+
+
+@app.route("/distibution_charges", methods=["GET", "POST"])
+def button_four():
+    output = None
+    if request.method == "POST":
+        output = ProcessForm.process_distribution_request(request)
+
+    return render_template("lamdas.html", output=output)
 
 
 def run_flask():

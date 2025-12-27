@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMF Toolkit | Scientific Suite</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* --- Palette --- */
+            --primary: #525743;
+            --primary-hover: #748464;
+            --bg-body: #F8F9F4;
+            --bg-card: #FFFFFF;
+            --header-bg: #BDC7B2;
+            --nav-bg: #D7DCCF;
+            --text-main: #2E2E2E;
+            --text-muted: #7b7e6b;
+            --border: #D7DCCF;
+            --active-bg: #E9ECE5;
+            --radius: 16px;
+            --shadow: 0 4px 12px rgba(82, 87, 67, 0.15);
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+            --success-bg: #dcfce7;
+            --success-text: #166534;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* --- Main Container --- */
+        .app-container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        /* --- Header --- */
+        .header {
+            background: var(--header-bg);
+            padding: 24px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #525743;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* --- Hidden Inputs for CSS State --- */
+        input[type="radio"],
+        input[type="checkbox"] {
+            display: none;
+        }
+
+        /* --- Global System Selector --- */
+        .system-selector {
+            display: flex;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .sys-label {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sys-label:hover {
+            border-color: var(--primary);
+        }
+
+        /* Highlight Active System */
+        #sys-cart:checked~.app-container .system-selector label[for="sys-cart"],
+        #sys-cyl:checked~.app-container .system-selector label[for="sys-cyl"],
+        #sys-sph:checked~.app-container .system-selector label[for="sys-sph"] {
+            background-color: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(82, 87, 67, 0.2);
+        }
+
+        /* --- Content Areas --- */
+        .content-section {
+            display: block;
+            padding: 24px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- Sub-Options (Pills) --- */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .option-label {
+            display: block;
+            padding: 12px;
+            text-align: center;
+            background: #ffffff;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .option-label:hover {
+            border-color: var(--primary-hover);
+            color: var(--primary);
+        }
+
+        /* Logic for Lambda Pills */
+        #opt-lam-line:checked~.app-container #lbl-lam-line,
+        #opt-lam-surf:checked~.app-container #lbl-lam-surf,
+        #opt-lam-vol:checked~.app-container #lbl-lam-vol {
+            border-color: var(--primary);
+            background-color: var(--active-bg);
+            color: var(--primary);
+        }
+
+        /* --- Form Container --- */
+        .form-container {
+            display: block;
+            background: #FCFCFA;
+            border: 1px solid var(--border);
+            padding: 24px;
+            border-radius: 12px;
+        }
+
+        /* --- Dynamic Label Logic (Pure CSS) --- */
+        /* 1. System Coordinates */
+        .lbl-cyl,
+        .lbl-sph {
+            display: none;
+        }
+
+        .lbl-cart {
+            display: block;
+        }
+
+        #sys-cyl:checked~.app-container .lbl-cart {
+            display: none;
+        }
+
+        #sys-cyl:checked~.app-container .lbl-sph {
+            display: none;
+        }
+
+        #sys-cyl:checked~.app-container .lbl-cyl {
+            display: block;
+        }
+
+        #sys-sph:checked~.app-container .lbl-cart {
+            display: none;
+        }
+
+        #sys-sph:checked~.app-container .lbl-cyl {
+            display: none;
+        }
+
+        #sys-sph:checked~.app-container .lbl-sph {
+            display: block;
+        }
+
+        /* 2. Lambda Labels */
+        .lbl-lam-s,
+        .lbl-lam-v {
+            display: none;
+        }
+
+        .lbl-lam-l {
+            display: block;
+        }
+
+        #opt-lam-surf:checked~.app-container .lbl-lam-l {
+            display: none;
+        }
+
+        #opt-lam-surf:checked~.app-container .lbl-lam-v {
+            display: none;
+        }
+
+        #opt-lam-surf:checked~.app-container .lbl-lam-s {
+            display: block;
+        }
+
+        #opt-lam-vol:checked~.app-container .lbl-lam-l {
+            display: none;
+        }
+
+        #opt-lam-vol:checked~.app-container .lbl-lam-s {
+            display: none;
+        }
+
+        #opt-lam-vol:checked~.app-container .lbl-lam-v {
+            display: block;
+        }
+
+        /* --- Inputs --- */
+        .input-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(82, 87, 67, 0.15);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+            color: var(--primary);
+        }
+
+        /* --- Toggle Checkbox Styling --- */
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+            padding: 6px 12px;
+            background: #eef1ea;
+            border-radius: 20px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .toggle-label:hover {
+            border-color: var(--primary);
+        }
+
+        .toggle-icon {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--primary);
+            border-radius: 4px;
+            display: inline-block;
+            position: relative;
+        }
+
+        /* --- Source Geometry Row Logic --- */
+        .geom-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid #f0f0f0;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            background: #fff;
+        }
+
+        .geom-label {
+            min-width: 80px;
+            font-weight: 700;
+            color: var(--text-main);
+            padding-bottom: 10px;
+        }
+
+        .var-checkbox:checked+.toggle-label {
+            background: var(--primary);
+            color: white;
+        }
+
+        .var-checkbox:checked+.toggle-label .toggle-icon {
+            border-color: white;
+        }
+
+        .var-checkbox:checked+.toggle-label .toggle-icon::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 2px;
+        }
+
+        /* Visibility Logic */
+        .var-checkbox:checked~.fixed-input {
+            display: none;
+        }
+
+        .var-checkbox:not(:checked)~.range-inputs {
+            display: none;
+        }
+
+        .var-checkbox:checked~.range-inputs {
+            display: flex;
+            flex: 1;
+            gap: 10px;
+            animation: fadeIn 0.2s;
+        }
+
+        .range-inputs input {
+            min-width: 80px;
+        }
+
+        /* --- Submit Button --- */
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: #FAFAFA;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* --- Results & Flash Messages --- */
+        .result-box {
+            margin-top: 24px;
+            padding: 20px;
+            background: var(--success-bg);
+            border: 1px solid var(--success-text);
+            color: var(--success-text);
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            animation: fadeIn 0.3s;
+        }
+
+        .flash-messages {
+            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .flash-error {
+            background: var(--error-bg);
+            color: var(--error-text);
+            border: 1px solid var(--error-text);
+        }
+
+        @media (max-width: 600px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .system-selector {
+                flex-direction: column;
+                padding: 16px;
+            }
+
+            .geom-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .input-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <form method="POST">
+
+        <!-- Updated Logic: Check request.form to persist state -->
+        <input type="radio" name="sys_opt" id="sys-cart" value="sys-cart" {% if request.form.get('sys_opt', 'sys-cart'
+            )=='sys-cart' %}checked{% endif %}>
+        <input type="radio" name="sys_opt" id="sys-cyl" value="sys-cyl" {% if request.form.get('sys_opt')=='sys-cyl'
+            %}checked{% endif %}>
+        <input type="radio" name="sys_opt" id="sys-sph" value="sys-sph" {% if request.form.get('sys_opt')=='sys-sph'
+            %}checked{% endif %}>
+
+        <input type="radio" name="lam_opt" id="opt-lam-line" value="opt-lam-line" {% if
+            request.form.get('lam_opt', 'opt-lam-line' )=='opt-lam-line' %}checked{% endif %}>
+        <input type="radio" name="lam_opt" id="opt-lam-surf" value="opt-lam-surf" {% if
+            request.form.get('lam_opt')=='opt-lam-surf' %}checked{% endif %}>
+        <input type="radio" name="lam_opt" id="opt-lam-vol" value="opt-lam-vol" {% if
+            request.form.get('lam_opt')=='opt-lam-vol' %}checked{% endif %}>
+
+        <div class="app-container">
+
+            <div class="header">
+                <h1>Distribution Charged</h1>
+                <p>Select lambda from below</p>
+            </div>
+
+            <div class="system-selector">
+                <label for="sys-cart" class="sys-label">Cartesian (x, y, z)</label>
+                <label for="sys-cyl" class="sys-label">Cylindrical (ρ, φ, z)</label>
+                <label for="sys-sph" class="sys-label">Spherical (r, θ, φ)</label>
+            </div>
+
+            <div class="content-section">
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="flash-messages-container">
+                    {% for category, message in messages %}
+                    <div class="flash-messages flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <div class="options-grid">
+                    <label for="opt-lam-line" class="option-label" id="lbl-lam-line">Line Charge (λ_l)</label>
+                    <label for="opt-lam-surf" class="option-label" id="lbl-lam-surf">Surface Charge (λ_s)</label>
+                    <label for="opt-lam-vol" class="option-label" id="lbl-lam-vol">Volume Charge (λ_v)</label>
+                </div>
+
+                <div class="form-container">
+
+                    <div class="section-title">Source Geometry</div>
+                    <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">Check "Varies" to define
+                        integration limits. Uncheck for fixed position. Accepts numbers or variables (e.g., x, y, z).
+                    </p>
+
+                    <div class="geom-row">
+                        <div class="geom-label">
+                            <span class="lbl-cart">Axis X</span>
+                            <span class="lbl-cyl">Axis ρ</span>
+                            <span class="lbl-sph">Axis r</span>
+                        </div>
+
+                        <input type="checkbox" id="var_1" name="is_var_1" class="var-checkbox" {% if
+                            request.form.get('is_var_1') %}checked{% endif %}>
+
+                        <label for="var_1" class="toggle-label">
+                            <span class="toggle-icon"></span> Varies
+                        </label>
+
+                        <div class="input-group fixed-input">
+                            <input type="text" name="src_1_fixed" placeholder="Fixed Position"
+                                value="{{ request.form.get('src_1_fixed', '') }}">
+                        </div>
+
+                        <div class="range-inputs">
+                            <div class="input-group">
+                                <input type="text" name="src_1_start" placeholder="Start"
+                                    value="{{ request.form.get('src_1_start', '') }}">
+                            </div>
+                            <div class="input-group">
+                                <input type="text" name="src_1_end" placeholder="End"
+                                    value="{{ request.form.get('src_1_end', '') }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="geom-row">
+                        <div class="geom-label">
+                            <span class="lbl-cart">Axis Y</span>
+                            <span class="lbl-cyl">Axis φ</span>
+                            <span class="lbl-sph">Axis θ</span>
+                        </div>
+
+                        <input type="checkbox" id="var_2" name="is_var_2" class="var-checkbox" {% if
+                            request.form.get('is_var_2') %}checked{% endif %}>
+
+                        <label for="var_2" class="toggle-label">
+                            <span class="toggle-icon"></span> Varies
+                        </label>
+
+                        <div class="input-group fixed-input">
+                            <input type="text" name="src_2_fixed" placeholder="Fixed Position"
+                                value="{{ request.form.get('src_2_fixed', '') }}">
+                        </div>
+
+                        <div class="range-inputs">
+                            <div class="input-group">
+                                <input type="text" name="src_2_start" placeholder="Start"
+                                    value="{{ request.form.get('src_2_start', '') }}">
+                            </div>
+                            <div class="input-group">
+                                <input type="text" name="src_2_end" placeholder="End"
+                                    value="{{ request.form.get('src_2_end', '') }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="geom-row">
+                        <div class="geom-label">
+                            <span class="lbl-cart">Axis Z</span>
+                            <span class="lbl-cyl">Axis Z</span>
+                            <span class="lbl-sph">Axis φ</span>
+                        </div>
+
+                        <input type="checkbox" id="var_3" name="is_var_3" class="var-checkbox" {% if
+                            request.form.get('is_var_3') %}checked{% endif %}>
+
+                        <label for="var_3" class="toggle-label">
+                            <span class="toggle-icon"></span> Varies
+                        </label>
+
+                        <div class="input-group fixed-input">
+                            <input type="text" name="src_3_fixed" placeholder="Fixed Position"
+                                value="{{ request.form.get('src_3_fixed', '') }}">
+                        </div>
+
+                        <div class="range-inputs">
+                            <div class="input-group">
+                                <input type="text" name="src_3_start" placeholder="Start"
+                                    value="{{ request.form.get('src_3_start', '') }}">
+                            </div>
+                            <div class="input-group">
+                                <input type="text" name="src_3_end" placeholder="End"
+                                    value="{{ request.form.get('src_3_end', '') }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-title" style="margin-top:24px;">Source Density</div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>
+                                <span class="lbl-lam-l">Linear Density (λ_l) - C/m</span>
+                                <span class="lbl-lam-s">Surface Density (λ_s) - C/m²</span>
+                                <span class="lbl-lam-v">Volume Density (λ_v) - C/m³</span>
+                            </label>
+                            <input type="text" name="lambda_val" placeholder="Enter density value or expression..."
+                                value="{{ request.form.get('lambda_val', '') }}">
+                        </div>
+                    </div>
+
+                    <button class="btn-submit" type="submit">Calculate Field</button>
+
+                    {% if output %}
+                    <div class="result-box">
+                        <h3>Result:</h3>
+                        <p style="font-size: 1.2em;">{{ output }}</p>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkboxes = [
+                document.getElementById('var_1'),
+                document.getElementById('var_2'),
+                document.getElementById('var_3')
+            ];
+            const lamRadios = document.querySelectorAll('input[name="lam_opt"]');
+
+            function enforceLimits(changedCheckbox) {
+                // Determine current limit based on selected radio
+                let limit = 3;
+                if (document.getElementById('opt-lam-line').checked) limit = 1;
+                if (document.getElementById('opt-lam-surf').checked) limit = 2;
+
+                const checkedBoxes = checkboxes.filter(cb => cb.checked);
+
+                if (checkedBoxes.length > limit) {
+                    if (limit === 1) {
+                        // Radio button behavior: Uncheck others, keep the new one
+                        checkedBoxes.forEach(cb => {
+                            if (cb !== changedCheckbox) cb.checked = false;
+                        });
+                    } else if (limit === 2) {
+                        // Surface behavior: Uncheck the first found one that isn't the new one
+                        for (let cb of checkedBoxes) {
+                            if (cb !== changedCheckbox) {
+                                cb.checked = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Listen for checkbox changes
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => enforceLimits(cb));
+            });
+
+            // Listen for Mode changes
+            lamRadios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    // Update: Explicitly reset all checkboxes to false when lambda type changes
+                    checkboxes.forEach(cb => cb.checked = false);
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>

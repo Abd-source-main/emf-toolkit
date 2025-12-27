@@ -1,0 +1,412 @@
+:root {
+    /* --- Original Palette Mapping --- */
+    --primary: #525743;
+    /* Old Button BG */
+    --primary-hover: #748464;
+    /* Old Button Hover */
+
+    --bg-body: #F8F9F4;
+    /* Old Cream Background */
+    --bg-card: #FFFFFF;
+    /* White Card */
+
+    --header-bg: #BDC7B2;
+    /* Old Topbar BG */
+    --nav-bg: #D7DCCF;
+    /* Old Sidebar BG */
+
+    --text-main: #2E2E2E;
+    /* Old Text Main */
+    --text-muted: #7b7e6b;
+    /* Muted Green/Grey */
+
+    --border: #D7DCCF;
+    /* Sidebar color used for borders */
+    --active-bg: #E9ECE5;
+    /* Light Sage for active states */
+
+    --radius: 16px;
+    --shadow: 0 4px 12px rgba(82, 87, 67, 0.15);
+    /* Green-tinted shadow */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* --- Main Container --- */
+.app-container {
+    width: 100%;
+    max-width: 800px;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+/* --- Header --- */
+.header {
+    background: var(--header-bg);
+    padding: 24px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+
+.header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+.header p {
+    color: #525743;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* --- Pure CSS State Management --- */
+input[type="radio"] {
+    display: none;
+}
+
+/* --- Global System Selector --- */
+.system-selector {
+    display: flex;
+    background: #ffffff;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    justify-content: center;
+    gap: 12px;
+}
+
+.sys-label {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.sys-label:hover {
+    border-color: var(--primary);
+}
+
+/* Highlight Active System */
+#sys-cart:checked~.app-container .system-selector label[for="sys-cart"],
+#sys-cyl:checked~.app-container .system-selector label[for="sys-cyl"],
+#sys-sph:checked~.app-container .system-selector label[for="sys-sph"] {
+    background-color: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+    box-shadow: 0 2px 4px rgba(82, 87, 67, 0.2);
+}
+
+/* --- Top Navigation Tabs --- */
+.nav-tabs {
+    display: flex;
+    background: var(--nav-bg);
+    padding: 6px;
+    margin: 20px 24px 0;
+    border-radius: 12px;
+}
+
+.nav-label {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-main);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+}
+
+.nav-label:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Highlight Active Tab */
+#tab-calc:checked~.app-container .nav-tabs label[for="tab-calc"],
+#tab-physics:checked~.app-container .nav-tabs label[for="tab-physics"] {
+    background: white;
+    color: var(--primary);
+    opacity: 1;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Content Areas --- */
+.content-section {
+    display: none;
+    padding: 24px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+#tab-calc:checked~.app-container #content-calc,
+#tab-physics:checked~.app-container #content-physics {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Sub-Options (Pills) --- */
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.option-label {
+    display: block;
+    padding: 12px;
+    text-align: center;
+    background: #ffffff;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: all 0.2s;
+}
+
+.option-label:hover {
+    border-color: var(--primary-hover);
+    color: var(--primary);
+}
+
+/* Logic for Vector Calc Pills */
+#opt-vec-single:checked~.app-container #lbl-vec-single,
+#opt-vec-two:checked~.app-container #lbl-vec-two,
+#opt-vec-charge:checked~.app-container #lbl-vec-charge {
+    border-color: var(--primary);
+    background-color: var(--active-bg);
+    color: var(--primary);
+}
+
+/* Logic for Physics Model Pills */
+#opt-phys-elec:checked~.app-container #lbl-phys-elec,
+#opt-phys-mag:checked~.app-container #lbl-phys-mag,
+#opt-phys-pot:checked~.app-container #lbl-phys-pot {
+    border-color: var(--primary);
+    background-color: var(--active-bg);
+    color: var(--primary);
+}
+
+/* --- Form Visibility Logic --- */
+.form-container {
+    display: none;
+    background: #FCFCFA;
+    border: 1px solid var(--border);
+    padding: 24px;
+    border-radius: 12px;
+}
+
+/* Vector Calc Logic */
+#opt-vec-single:checked~.app-container #form-vec-single,
+#opt-vec-two:checked~.app-container #form-vec-two,
+#opt-vec-charge:checked~.app-container #form-vec-charge {
+    display: block;
+}
+
+/* Physics Models Visibility (Controlled by Global System) */
+#sys-cart:checked~.app-container #form-phys-cart,
+#sys-cyl:checked~.app-container #form-phys-cyl,
+#sys-sph:checked~.app-container #form-phys-sph {
+    display: block;
+}
+
+/* --- Dynamic Label Logic (Pure CSS Magic) --- */
+
+/* 1. System Coordinates (x,y,z vs r,th,ph) */
+.lbl-cyl,
+.lbl-sph {
+    display: none;
+}
+
+.lbl-cart {
+    display: block;
+}
+
+#sys-cyl:checked~.app-container .lbl-cart {
+    display: none;
+}
+
+#sys-cyl:checked~.app-container .lbl-sph {
+    display: none;
+}
+
+#sys-cyl:checked~.app-container .lbl-cyl {
+    display: block;
+}
+
+#sys-sph:checked~.app-container .lbl-cart {
+    display: none;
+}
+
+#sys-sph:checked~.app-container .lbl-cyl {
+    display: none;
+}
+
+#sys-sph:checked~.app-container .lbl-sph {
+    display: block;
+}
+
+/* 2. Physics Quantities (Electric vs Magnetic vs Potential) */
+.lbl-mag,
+.lbl-pot {
+    display: none;
+}
+
+.lbl-elec {
+    display: block;
+}
+
+#opt-phys-mag:checked~.app-container .lbl-elec {
+    display: none;
+}
+
+#opt-phys-mag:checked~.app-container .lbl-pot {
+    display: none;
+}
+
+#opt-phys-mag:checked~.app-container .lbl-mag {
+    display: block;
+}
+
+#opt-phys-pot:checked~.app-container .lbl-elec {
+    display: none;
+}
+
+#opt-phys-pot:checked~.app-container .lbl-mag {
+    display: none;
+}
+
+#opt-phys-pot:checked~.app-container .lbl-pot {
+    display: block;
+}
+
+
+/* --- Inputs --- */
+.input-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.input-group {
+    flex: 1;
+    min-width: 120px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.2s;
+    font-family: 'Inter', sans-serif;
+    background-color: #ffffff;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(82, 87, 67, 0.15);
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    color: var(--primary);
+}
+
+/* --- Submit Button --- */
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--primary);
+    color: #FAFAFA;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-submit:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+    .options-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nav-tabs {
+        margin: 10px 16px 0;
+    }
+
+    .content-section {
+        padding: 16px;
+    }
+
+    .system-selector {
+        flex-direction: column;
+        padding: 16px;
+    }
+
+    .sys-label {
+        text-align: center;
+    }
+}
