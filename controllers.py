@@ -14,6 +14,20 @@ class static_var:
     input_type = "two vectors with c"
 
 
+def make_output_clean(v):
+    # convert Vector or np.array to a plain list of floats rounded to 3 decimal places
+    if isinstance(v, Vector):
+        return [float(round(x, 3)) for x in v.xyz]   # unpack Vector
+    elif isinstance(v, np.ndarray):
+        return [float(round(x, 3)) for x in v]        # unpack NumPy array
+    elif isinstance(v, list):
+        return [float(round(x, 3)) for x in v]        # unpack list
+    elif isinstance(v, str):
+        return v
+    else:
+        return round(v, 3)
+
+
 def process_input(request, input_type):
     x1, y1, z1 = ProcessForm.get_form_input(
         request, ["input_x1", "input_y1", "input_z1"])
@@ -23,6 +37,8 @@ def process_input(request, input_type):
     if input_type == "single vector":
         static_var.input = [*v1.xyz]
         static_var.output = [
+            f"unit vector of vector1: {make_output_clean(unit1)}",
+            f"magnitude of vector1: {make_output_clean(mag1)}"
             f"unit vector of vector1: {make_output_clean(unit1)}",
             f"magnitude of vector1: {make_output_clean(mag1)}"
         ]
@@ -81,10 +97,22 @@ def process_input(request, input_type):
             f"unit vector of vector2: {make_output_clean(unit2)}",
             f"magnitude of vector1: {make_output_clean(mag1)}",
             f"magnitude of vector2: {make_output_clean(mag2)}"
+            f"vector2 - vector1: {make_output_clean(v12)}",
+            f"vector1 + vector2: {make_output_clean(v1.nxyz + v2.nxyz)}",
+            f"magnitude of vector12: {make_output_clean(mag)}",
+            f"unit vector of vector12: {make_output_clean(unit)}",
+            f"cross product vector of vector12: {make_output_clean(cross_prod)}",
+            f"dot product vector of vector12: {make_output_clean(dot_prod)}",
+            f"unit vector of vector1: {make_output_clean(unit1)}",
+            f"unit vector of vector2: {make_output_clean(unit2)}",
+            f"magnitude of vector1: {make_output_clean(mag1)}",
+            f"magnitude of vector2: {make_output_clean(mag2)}"
         ]
     elif input_type == "single vector":
         static_var.input = [*v1.xyz]
         static_var.output = [
+            f"unit vector of vector1: {make_output_clean(unit1)}",
+            f"magnitude of vector1: {make_output_clean(mag1)}"
             f"unit vector of vector1: {make_output_clean(unit1)}",
             f"magnitude of vector1: {make_output_clean(mag1)}"
         ]
