@@ -55,10 +55,16 @@
 
                         <!-- ROW 1: Text Info -->
                         <div class="charge-text-group">
+                            {% if charge.type == 'distribution' %}
+                            <span class="charge-id"><strong>Dist {{ charge.id }}:</strong> {{ charge.density_expr
+                                }}</span>
+                            <span class="charge-pos"><strong>Sys:</strong> {{ charge.sys_opt }}</span>
+                            {% else %}
                             <span class="charge-id"><strong>Charge {{ charge.id }}:</strong> {{ charge.charge_value }}
                                 C</span>
                             <span class="charge-pos"><strong>Pos:</strong> ({{ charge.x_pos }}, {{ charge.y_pos }}, {{
                                 charge.z_pos }})</span>
+                            {% endif %}
                         </div>
 
                         <!-- ROW 2: Small Actions (Side by Side) -->
@@ -71,10 +77,13 @@
                                     value="remove_charge{{ charge.id }}">× Remove</button>
                         </div>
 
-                        <!-- ROW 3: Wide Button -->
+                        <!-- ROW 3: Wide Button (Only for Point Charges) -->
+                        {% if charge.type != 'distribution' %}
                         <button class="btn-wide" name="current_charges_button" value="calculate_effect{{ charge.id }}">
                             Calculate Effect
                         </button>
+                        {% endif %}
+
                         </form>
 
 
@@ -84,28 +93,18 @@
                 </div>
             </div>
 
+            <!-- New Distribution Section -->
             <div class="input-section">
-                <!-- maybe delete this  -->
-                <h3 class="section-title">Target Point</h3>
+                <h3 class="section-title">Distributions</h3>
                 <div class="charge-input">
-                    <div class="input-group">
-                        <label for="target-x">X Position (m)</label>
-                        <input type="number" id="target-x" step="0.01" value="1">
-                    </div>
-                    <div class="input-group">
-                        <label for="target-y">Y Position (m)</label>
-                        <input type="number" id="target-y" step="0.01" value="1">
-                    </div>
-                    <div class="input-group">
-                        <label for="target-z">Z Position (m)</label>
-                        <input type="number" id="target-z" step="0.01" value="1">
-                    </div>
-                    <div class="input-group">
-                        <label for="target-charge">Target Charge (C)</label>
-                        <input type="number" id="target-charge" step="0.000000001" value="1e-9">
-                    </div>
+                    <p style="font-size: 0.9em; color: #666; margin-bottom: 10px;">
+                        Add continuous charge distributions (Line, Surface, Volume).
+                    </p>
                     <div class="button-group">
-                        <button class="btn btn-primary" id="calculate">Calculate</button>
+                        <a href="{{ url_for('button_four') }}" class="btn btn-primary"
+                            style="text-decoration: none; display: block; text-align: center;">
+                            Add Distribution Charge
+                        </a>
                     </div>
                 </div>
             </div>
@@ -190,3 +189,6 @@
     {% endfor %}
     {% endif %}
     {% endwith %}
+</body>
+
+</html>

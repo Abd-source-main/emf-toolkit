@@ -140,42 +140,6 @@
             }
         }
 
-        /* --- Sub-Options (Pills) --- */
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .option-label {
-            display: block;
-            padding: 12px;
-            text-align: center;
-            background: #ffffff;
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
-            transition: all 0.2s;
-        }
-
-        .option-label:hover {
-            border-color: var(--primary-hover);
-            color: var(--primary);
-        }
-
-        /* Logic for Lambda Pills */
-        #opt-lam-line:checked~.app-container #lbl-lam-line,
-        #opt-lam-surf:checked~.app-container #lbl-lam-surf,
-        #opt-lam-vol:checked~.app-container #lbl-lam-vol {
-            border-color: var(--primary);
-            background-color: var(--active-bg);
-            color: var(--primary);
-        }
-
         /* --- Form Container --- */
         .form-container {
             display: block;
@@ -183,6 +147,7 @@
             border: 1px solid var(--border);
             padding: 24px;
             border-radius: 12px;
+            margin-top: 20px;
         }
 
         /* --- Dynamic Label Logic (Pure CSS) --- */
@@ -217,40 +182,6 @@
         }
 
         #sys-sph:checked~.app-container .lbl-sph {
-            display: block;
-        }
-
-        /* 2. Lambda Labels */
-        .lbl-lam-s,
-        .lbl-lam-v {
-            display: none;
-        }
-
-        .lbl-lam-l {
-            display: block;
-        }
-
-        #opt-lam-surf:checked~.app-container .lbl-lam-l {
-            display: none;
-        }
-
-        #opt-lam-surf:checked~.app-container .lbl-lam-v {
-            display: none;
-        }
-
-        #opt-lam-surf:checked~.app-container .lbl-lam-s {
-            display: block;
-        }
-
-        #opt-lam-vol:checked~.app-container .lbl-lam-l {
-            display: none;
-        }
-
-        #opt-lam-vol:checked~.app-container .lbl-lam-s {
-            display: none;
-        }
-
-        #opt-lam-vol:checked~.app-container .lbl-lam-v {
             display: block;
         }
 
@@ -405,13 +336,23 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            margin-top: 20px;
+            margin-top: 10px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .btn-submit:hover {
             background-color: var(--primary-hover);
             transform: translateY(-1px);
+        }
+
+        /* Secondary Action Button */
+        .btn-secondary {
+            background-color: #7b7e6b;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #525743;
         }
 
         /* --- Results & Flash Messages --- */
@@ -440,11 +381,13 @@
             border: 1px solid var(--error-text);
         }
 
-        @media (max-width: 600px) {
-            .options-grid {
-                grid-template-columns: 1fr;
-            }
+        .flash-success {
+            background: var(--success-bg);
+            color: var(--success-text);
+            border: 1px solid var(--success-text);
+        }
 
+        @media (max-width: 600px) {
             .system-selector {
                 flex-direction: column;
                 padding: 16px;
@@ -475,18 +418,11 @@
         <input type="radio" name="sys_opt" id="sys-sph" value="sys-sph" {% if request.form.get('sys_opt')=='sys-sph'
             %}checked{% endif %}>
 
-        <input type="radio" name="lam_opt" id="opt-lam-line" value="opt-lam-line" {% if
-            request.form.get('lam_opt', 'opt-lam-line' )=='opt-lam-line' %}checked{% endif %}>
-        <input type="radio" name="lam_opt" id="opt-lam-surf" value="opt-lam-surf" {% if
-            request.form.get('lam_opt')=='opt-lam-surf' %}checked{% endif %}>
-        <input type="radio" name="lam_opt" id="opt-lam-vol" value="opt-lam-vol" {% if
-            request.form.get('lam_opt')=='opt-lam-vol' %}checked{% endif %}>
-
         <div class="app-container">
 
             <div class="header">
                 <h1>Distribution Charged</h1>
-                <p>Select lambda from below</p>
+                <p>Define your charge density and integration limits.</p>
             </div>
 
             <div class="system-selector">
@@ -506,12 +442,6 @@
                 </div>
                 {% endif %}
                 {% endwith %}
-
-                <div class="options-grid">
-                    <label for="opt-lam-line" class="option-label" id="lbl-lam-line">Line Charge (λ_l)</label>
-                    <label for="opt-lam-surf" class="option-label" id="lbl-lam-surf">Surface Charge (λ_s)</label>
-                    <label for="opt-lam-vol" class="option-label" id="lbl-lam-vol">Volume Charge (λ_v)</label>
-                </div>
 
                 <div class="form-container">
 
@@ -617,16 +547,19 @@
                     <div class="input-row">
                         <div class="input-group">
                             <label>
-                                <span class="lbl-lam-l">Linear Density (λ_l) - C/m</span>
-                                <span class="lbl-lam-s">Surface Density (λ_s) - C/m²</span>
-                                <span class="lbl-lam-v">Volume Density (λ_v) - C/m³</span>
+                                Charge Density (λ_l, λ_s, λ_v)
                             </label>
                             <input type="text" name="lambda_val" placeholder="Enter density value or expression..."
                                 value="{{ request.form.get('lambda_val', '') }}">
                         </div>
                     </div>
 
-                    <button class="btn-submit" type="submit">Calculate Field</button>
+                    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;">
+                        <button class="btn-submit" type="submit" name="action" value="calculate"
+                            style="flex:2;">Calculate Total Charge</button>
+                        <button class="btn-submit btn-secondary" type="submit" name="action" value="add_to_physics"
+                            style="flex:1;">Export to Physics</button>
+                    </div>
 
                     {% if output %}
                     <div class="result-box">
@@ -639,56 +572,6 @@
             </div>
         </div>
     </form>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const checkboxes = [
-                document.getElementById('var_1'),
-                document.getElementById('var_2'),
-                document.getElementById('var_3')
-            ];
-            const lamRadios = document.querySelectorAll('input[name="lam_opt"]');
-
-            function enforceLimits(changedCheckbox) {
-                // Determine current limit based on selected radio
-                let limit = 3;
-                if (document.getElementById('opt-lam-line').checked) limit = 1;
-                if (document.getElementById('opt-lam-surf').checked) limit = 2;
-
-                const checkedBoxes = checkboxes.filter(cb => cb.checked);
-
-                if (checkedBoxes.length > limit) {
-                    if (limit === 1) {
-                        // Radio button behavior: Uncheck others, keep the new one
-                        checkedBoxes.forEach(cb => {
-                            if (cb !== changedCheckbox) cb.checked = false;
-                        });
-                    } else if (limit === 2) {
-                        // Surface behavior: Uncheck the first found one that isn't the new one
-                        for (let cb of checkedBoxes) {
-                            if (cb !== changedCheckbox) {
-                                cb.checked = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Listen for checkbox changes
-            checkboxes.forEach(cb => {
-                cb.addEventListener('change', () => enforceLimits(cb));
-            });
-
-            // Listen for Mode changes
-            lamRadios.forEach(radio => {
-                radio.addEventListener('change', () => {
-                    // Update: Explicitly reset all checkboxes to false when lambda type changes
-                    checkboxes.forEach(cb => cb.checked = false);
-                });
-            });
-        });
-    </script>
 
 </body>
 
