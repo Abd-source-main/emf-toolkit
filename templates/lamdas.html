@@ -421,8 +421,13 @@
         <div class="app-container">
 
             <div class="header">
-                <h1>Distribution Charged</h1>
-                <p>Define your charge density and integration limits.</p>
+                <h1>Distribution Charged </h1>
+                <p style="display: flex; margin-left: 30%;">Define your charge density and integration limits. <a
+                        href="{{ url_for('home') }}" style="margin-left: auto;"">
+                        <img src=" {{ url_for('static', filename='icons/home.png' ) }}" alt="return to home"
+                        style="width:30px; height:30px; display:flex; margin-right: auto;">
+                    </a>
+                </p>
             </div>
 
             <div class="system-selector">

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coordinate Converter | Scientific Suite</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* --- Original Palette --- */
+            --primary: #525743;
+            --primary-hover: #748464;
+            --bg-body: #F8F9F4;
+            --bg-card: #FFFFFF;
+            --header-bg: #BDC7B2;
+            --nav-bg: #D7DCCF;
+            --text-main: #2E2E2E;
+            --text-muted: #7b7e6b;
+            --border: #D7DCCF;
+            --active-bg: #E9ECE5;
+            --radius: 16px;
+            --shadow: 0 4px 12px rgba(82, 87, 67, 0.15);
+            --success-bg: #dcfce7;
+            --success-text: #166534;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 700px;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header --- */
+        .header {
+            background: var(--header-bg);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-main);
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .home-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            transition: all 0.2s ease;
+        }
+
+        .home-btn:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: scale(1.05);
+        }
+
+        /* --- Layout Sections --- */
+        .config-section {
+            background: var(--active-bg);
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .input-section {
+            padding: 32px;
+            background: var(--bg-card);
+        }
+
+        /* --- Translation Bar (From -> To) --- */
+        .translation-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .select-group {
+            flex: 1;
+        }
+
+        .select-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .system-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: white;
+            color: var(--text-main);
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            appearance: none;
+            /* Custom Arrow */
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23525743%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 10px;
+        }
+
+        .arrow-icon {
+            font-size: 20px;
+            color: var(--text-muted);
+            margin-top: 18px;
+            /* Visual alignment with inputs */
+        }
+
+        /* --- Toggle (Point/Vector) --- */
+        .type-toggle {
+            display: flex;
+            background: white;
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            width: fit-content;
+            margin: 0 auto;
+            /* Center it */
+        }
+
+        .state-radio {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .toggle-btn {
+            padding: 8px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        /* Active State Logic */
+        #type-point:checked~.config-section .type-toggle label[for="type-point"],
+        #type-vector:checked~.config-section .type-toggle label[for="type-vector"] {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* --- Data Entry Section --- */
+        .coordinates-row {
+            display: flex;
+            gap: 16px;
+            margin-top: 10px;
+        }
+
+        .coord-group {
+            flex: 1;
+            position: relative;
+        }
+
+        .coord-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .coord-input {
+            width: 100%;
+            padding: 14px 12px;
+            border: 2px solid var(--border);
+            /* Slightly thicker border */
+            border-radius: 12px;
+            font-size: 16px;
+            background: #FAFAFA;
+            transition: border-color 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .coord-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .section-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- Dynamic Titles --- */
+        .title-text {
+            display: none;
+        }
+
+        #type-point:checked~.input-section .section-label .text-point {
+            display: inline;
+        }
+
+        #type-vector:checked~.input-section .section-label .text-vector {
+            display: inline;
+        }
+
+        /* --- Reference Point (Hidden Logic) --- */
+        #ref-point-block {
+            display: none;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px dashed var(--border);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        #type-vector:checked~.input-section #ref-point-block {
+            display: block;
+        }
+
+        /* --- Legend --- */
+        .legend {
+            margin-top: 24px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            background: var(--active-bg);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        /* --- Action --- */
+        .btn-convert {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 32px;
+            transition: background-color 0.2s;
+            letter-spacing: 0.02em;
+        }
+
+        .btn-convert:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* --- Result --- */
+        .result-panel {
+            margin-top: 24px;
+            padding: 20px;
+            background: var(--success-bg);
+            border: 1px solid var(--success-text);
+            color: var(--success-text);
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- 1. Header -->
+        <div class="header">
+            <h1>Coordinate Converter</h1>
+            <a href="/" class="home-btn">
+                <img src="{{ url_for('static', filename='icons/home.png') }}" alt="Home"
+                    style="width: 20px; height: 20px; opacity: 0.8;">
+            </a>
+        </div>
+
+        <form method="POST">
+            <!-- Global State Controls (Hidden) -->
+            <!-- JINJA LOGIC ADDED: Retains selection (default 'point') -->
+            <input type="radio" name="conversion_type" id="type-point" value="point" class="state-radio" {% if
+                request.form.get('conversion_type', 'point' )=='point' %}checked{% endif %}>
+
+            <!-- JINJA LOGIC ADDED: Retains selection -->
+            <input type="radio" name="conversion_type" id="type-vector" value="vector" class="state-radio" {% if
+                request.form.get('conversion_type')=='vector' %}checked{% endif %}>
+
+            <!-- 2. Configuration Section (Top Panel) -->
+            <div class="config-section">
+                <!-- Translation Bar -->
+                <div class="translation-bar">
+                    <div class="select-group">
+                        <label>Convert From</label>
+                        <select name="src_sys" class="system-select">
+                            <option value="cartesian" {% if request.form.get('src_sys')=='cartesian' %}selected{% endif
+                                %}>Cartesian (x,y,z)</option>
+                            <option value="cylindrical" {% if request.form.get('src_sys')=='cylindrical' %}selected{%
+                                endif %}>Cylindrical (ρ,φ,z)</option>
+                            <option value="spherical" {% if request.form.get('src_sys')=='spherical' %}selected{% endif
+                                %}>Spherical (r,θ,φ)</option>
+                        </select>
+                    </div>
+
+                    <div class="arrow-icon">➝</div>
+
+                    <div class="select-group">
+                        <label>Convert To</label>
+                        <select name="dest_sys" class="system-select">
+                            <option value="cartesian" {% if request.form.get('dest_sys')=='cartesian' %}selected{% endif
+                                %}>Cartesian (x,y,z)</option>
+                            <option value="cylindrical" {% if request.form.get('dest_sys')=='cylindrical' %}selected{%
+                                endif %}>Cylindrical (ρ,φ,z)</option>
+                            <option value="spherical" {% if request.form.get('dest_sys')=='spherical' %}selected{% endif
+                                %}>Spherical (r,θ,φ)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Type Toggle -->
+                <div class="type-toggle">
+                    <label for="type-point" class="toggle-btn">Point</label>
+                    <label for="type-vector" class="toggle-btn">Vector</label>
+                </div>
+            </div>
+
+            <!-- 3. Input Section (Bottom Panel) -->
+            <div class="input-section">
+
+                <!-- Primary Inputs -->
+                <div class="section-label">
+                    <span class="title-text text-point">Coordinates</span>
+                    <span class="title-text text-vector">Vector Components</span>
+                </div>
+
+                <div class="coordinates-row">
+                    <div class="coord-group">
+                        <label>1st Comp (x/ρ/r)</label>
+                        <!-- Persist value -->
+                        <input type="number" step="any" name="v1" class="coord-input" required
+                            value="{{ request.form.get('v1', '0') }}">
+                    </div>
+                    <div class="coord-group">
+                        <label>2nd Comp (y/φ/θ)</label>
+                        <!-- Persist value -->
+                        <input type="number" step="any" name="v2" class="coord-input" required
+                            value="{{ request.form.get('v2', '0') }}">
+                    </div>
+                    <div class="coord-group">
+                        <label>3rd Comp (z/z/φ)</label>
+                        <!-- Persist value -->
+                        <input type="number" step="any" name="v3" class="coord-input" required
+                            value="{{ request.form.get('v3', '0') }}">
+                    </div>
+                </div>
+
+                <!-- Reference Point (Visible only for Vectors) -->
+                <div id="ref-point-block">
+                    <div class="section-label">Vector Origin</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+                        Location of the vector (in "From" system units).
+                    </p>
+                    <div class="coordinates-row">
+                        <div class="coord-group">
+                            <label>Pos 1</label>
+                            <input type="number" step="any" name="p1" class="coord-input"
+                                value="{{ request.form.get('p1', '0') }}">
+                        </div>
+                        <div class="coord-group">
+                            <label>Pos 2</label>
+                            <input type="number" step="any" name="p2" class="coord-input"
+                                value="{{ request.form.get('p2', '0') }}">
+                        </div>
+                        <div class="coord-group">
+                            <label>Pos 3</label>
+                            <input type="number" step="any" name="p3" class="coord-input"
+                                value="{{ request.form.get('p3', '0') }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="legend">
+                    <strong>Order:</strong> Cartesian (x,y,z) • Cylindrical (ρ,φ,z) • Spherical (r,θ,φ)
+                </div>
+
+                <button type="submit" class="btn-convert">Calculate Conversion</button>
+
+                <!-- Result -->
+                {% if result %}
+                <div class="result-panel">
+                    Result: {{ result }}
+                </div>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+</body>
+
+</html>

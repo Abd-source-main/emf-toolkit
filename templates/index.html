@@ -17,7 +17,7 @@
     <div class="left">
         <div class="logo">EMF Toolkit</div>
         <form class="buttons" method="POST">
-            <button name="button" value="button_one">Main content </button>
+            <button name="button" value="button_one">Basic vector operations</button>
             <input type="checkbox" id="toggle-buttons">
             <!-- toggle button -->
             <label for="toggle-buttons">Sketch</label>
@@ -29,6 +29,8 @@
 
             <button name="button" value="button_three">Physics applications</button>
             <button name="button" value="button_four">Distribution Charges</button>
+            <button name="button" value="button_five">convertor</button>
+
         </form>
         <div class="idk">v0.1-alpha</div>
     </div>
@@ -47,8 +49,6 @@
             <form method="POST" class="input-card">
                 <label for="input_type">Select Input Type:</label>
                 <select id="input_type" name="input_type" onchange="this.form.submit()">
-                    <option value="two vectors with c" {% if input_type=="two vectors with c" %}selected{% endif %}>Two
-                        vectors with charges</option>
                     <option value="two vectors without c" {% if input_type=="two vectors without c" %}selected{% endif
                         %}>Two vectors </option>
                     <option value="single vector" {% if input_type=="single vector" %}selected{% endif %}>Single vector
@@ -72,15 +72,6 @@
                     <button type="submit">Submit</button>
                 </div>
             </form>
-
-            {% elif input_type == "two vectors with c" %}
-            <form method="POST">
-                {{ vector_inputs(1, input_to_jinja[0:4], True) }}
-                {{ vector_inputs(2, input_to_jinja[4:8], True) }}
-                <div style="text-align:center;">
-                    <button type="submit">Submit</button>
-                </div>
-            </form>
             {% endif %}
 
             {% if output_to_jinja %}
@@ -93,7 +84,6 @@
                 </ul>
             </div>
             {% endif %}
-
 
             {% else %}
             <h2>Unknown Section</h2>

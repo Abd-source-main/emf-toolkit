@@ -148,7 +148,6 @@ class ProcessForm:
             # 1. Extract Global Options
             sys_opt = request.form.get('sys_opt', 'sys-cart')
             # lam_opt is used for display purposes
-            lam_opt = request.form.get('lam_opt', 'opt-lam-line')
 
             density_expr = request.form.get('lambda_val')
             if not density_expr:
@@ -220,7 +219,7 @@ class ProcessForm:
         if "button" in request.form:
             btn = request.form.get("button")
             static_var.button = btn if btn in [
-                "button_one", "cartesian", "cylindrical", "spherical", "button_three", "button_four"] else "home"
+                "button_one", "cartesian", "cylindrical", "spherical", "button_three", "button_four", "button_five"] else "home"
 
         # Input type select
         if "input_type" in request.form:
@@ -286,3 +285,70 @@ class ProcessForm:
                     flash(str(e) + " in controllers ")
 
         return [], None
+
+    @staticmethod
+    def process_conversion_request(request):
+        CC = CoordinateConverter
+        try:
+            conv_type = request.form.get('conversion_type', 'point')
+            src = request.form.get('src_sys')
+            dest = request.form.get('dest_sys')
+
+            # Input vector/point components
+            try:
+                c1 = float(request.form.get('v1', 0))
+                c2 = float(request.form.get('v2', 0))
+                c3 = float(request.form.get('v3', 0))
+            except ValueError:
+                return "Error: Invalid numeric input"
+
+            raw_result = None
+
+            if conv_type == 'point':
+                # Map source to dest method name
+                method_name = f"{src}_to_{dest}_point"
+
+                if src == dest:
+                    raw_result = (c1, c2, c3)
+                elif hasattr(CC, method_name):
+                    converter = getattr(CC, method_name)
+                    raw_result = converter(c1, c2, c3)
+                else:
+                    return f"Error: {method_name} not implemented."
+
+            elif conv_type == 'vector':
+                # Vector conversion needs a reference point
+                try:
+                    p1 = float(request.form.get('p1', 0))
+                    p2 = float(request.form.get('p2', 0))
+                    p3 = float(request.form.get('p3', 0))
+                except ValueError:
+                    return "Error: Invalid reference point"
+
+                # Map source to dest vector method name
+                method_name = f"vector_{src}_to_{dest}"
+
+                if src == dest:
+                    raw_result = (c1, c2, c3)
+                elif hasattr(CC, method_name):
+                    converter = getattr(CC, method_name)
+                    raw_result = converter(c1, c2, c3, p1, p2, p3)
+                else:
+                    return f"Error: {method_name} not implemented."
+
+            else:
+                return "Error: Invalid conversion type."
+
+            # Apply Engineering Notation Formatting to the results
+            if raw_result is not None:
+                # Ensure raw_result is iterable
+                if not isinstance(raw_result, (list, tuple)):
+                    raw_result = [raw_result]
+
+                formatted_values = [to_eng(val) for val in raw_result]
+                return f"({', '.join(formatted_values)})"
+
+            return "Error: Conversion yielded no result"
+
+        except Exception as e:
+            return f"Error: {str(e)}"

@@ -53,6 +53,9 @@ def home():
     elif button == "button_four":
         static_var.button = "home"
         return redirect("/distibution_charges")
+    elif button == "button_five":
+        static_var.button = "home"
+        return redirect("/convertor")
     """ end of redirecting """
 
     return render_template(
@@ -128,27 +131,33 @@ def button_three():
 @app.route("/distibution_charges", methods=["GET", "POST"])
 def button_four():
     output = None
-    if request.method == "POST":
-        output = ProcessForm.process_distribution_request(request)
+    output = ProcessForm.process_distribution_request(request)
 
     return render_template("lamdas.html", output=output)
 
 
+@app.route("/convertor", methods=["GET", "POST"])
+def button_five():
+    result = ProcessForm.process_conversion_request(request)
+    return render_template("convertor.html",
+                           result=result)
+
+
 def run_flask():
     # IMP:disable debug for production build
-    app.run(debug=True, use_reloader=True)
+    app.run(debug=False, use_reloader=False)
 
 
 if __name__ == "__main__":
     # uncomment to for final product
-    run_flask()
+    # run_flask()
 
     # # Start Flask in background thread
-    # flask_thread = threading.Thread(target=run_flask)
-    # flask_thread.daemon = True
-    # flask_thread.start()
+    flask_thread = threading.Thread(target=run_flask)
+    flask_thread.daemon = True
+    flask_thread.start()
 
-    # # Open PyWebView window
-    # webview.create_window(
-    #     "EMF App", "http://127.0.0.1:5000", width=1200, height=800)
-    # webview.start()
+    # Open PyWebView window
+    webview.create_window(
+        "EMF App", "http://127.0.0.1:5000", width=1200, height=800)
+    webview.start()
