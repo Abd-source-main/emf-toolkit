@@ -104,7 +104,7 @@ class CalcChargeFromLamdas(Preparers):
         current_density = density_expr
 
         for var_name, val_str in fixed_subs.items():
-            # Replace in h_factors (e.g., replace 'r' in 'r*sin(theta)')
+            # Replace in h_factors (e.g. : replace 'r' in 'r*sin(theta)' as r is constant)
             for k in range(len(current_h_factors)):
                 current_h_factors[k] = current_h_factors[k].replace(
                     var_name, val_str)
@@ -114,18 +114,19 @@ class CalcChargeFromLamdas(Preparers):
 
         # 2. Construct Final Integrand
         # Integrand = Density * Product(h_factors of ACTIVE vars)
-        final_jacobian_parts = []
+        final_h_factors = []
         for i in range(len(coords)):
             var_name = coords[i]
             if var_name in active_vars:
-                # Only include the metric factor (Jacobian) if we are traversing that dimension
+                # Only include the active h factor
                 # and it is not '1'
                 if current_h_factors[i] != '1':
-                    final_jacobian_parts.append(current_h_factors[i])
+                    final_h_factors.append(current_h_factors[i])
 
         final_expr_str = current_density
-        if final_jacobian_parts:
-            jacobian_mult = "*".join(final_jacobian_parts)
+        if final_h_factors:
+            # format the list to string for injection
+            jacobian_mult = "*".join(final_h_factors)
             final_expr_str = f"({current_density}) * {jacobian_mult}"
 
         # 3. Call Specific Lambda Function based on number of active variables

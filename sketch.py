@@ -118,8 +118,9 @@ class Sketch_element:
         vec_color = vec["color"] if "color" in vec else "blue"
 
         # Convert cylindrical to cartesian coordinates for plotting
-        x0, y0, z = CC.cylindrical_to_cartesian(r, phi, z)
-        x1, y1, z_end = CC.cylindrical_to_cartesian(r_end, phi_end, z_end)
+        x0, y0, z = CC.cylindrical_to_cartesian_point(r, phi, z)
+        x1, y1, z_end = CC.cylindrical_to_cartesian_point(
+            r_end, phi_end, z_end)
 
         new_dict = {"start": (x0, y0, z),
                     "end": (x1, y1, z_end),
@@ -138,8 +139,8 @@ class Sketch_element:
         vec_color = vec["color"] if "color" in vec else "blue"
 
         # Convert spherical to cartesian coordinates for plotting
-        x0, y0, z0 = CC.spherical_to_cartesian(radius, theta, phi)
-        x1, y1, z1 = CC.spherical_to_cartesian(
+        x0, y0, z0 = CC.spherical_to_cartesian_point(radius, theta, phi)
+        x1, y1, z1 = CC.spherical_to_cartesian_point(
             radius_end, theta_end, phi_end)
 
         new_dict = {"start": (x0, y0, z0),
@@ -269,7 +270,7 @@ class Sketch_element:
 
     @staticmethod
     def sketch_cylinder(rho, phi, z, config, size=4):
-        x, y, z = CC.cylindrical_to_cartesian(rho, phi, z)
+        x, y, z = CC.cylindrical_to_cartesian_point(rho, phi, z)
         # sketch top and bottom circles
         Sketch_element.sketch_circle(radius=rho, range=(
             0, phi), around_axis='z', config=config, size=size, shift=-z)
@@ -412,7 +413,7 @@ class Sketch_plane:
         cls.xyz_vectors.append(vector)
 
         # Cartesian -> Cylindrical
-        rho, phi, z = CC.cartesian_to_cylindrical(*vector['end'])
+        rho, phi, z = CC.cartesian_to_cylindrical_point(*vector['end'])
         cls.ppz_vectors.append({
             'start': (0, 0, 0),
             'end': (rho, phi, z),
@@ -421,7 +422,7 @@ class Sketch_plane:
         })
 
         # Cartesian -> Spherical
-        radius, theta, phi = CC.cartesian_to_spherical(*vector['end'])
+        radius, theta, phi = CC.cartesian_to_spherical_point(*vector['end'])
         cls.rtp_vectors.append({
             'start': (0, 0, 0),
             'end': (radius, theta, phi),
@@ -433,7 +434,7 @@ class Sketch_plane:
         cls.ppz_vectors.append(vector)
 
         # Cylindrical -> Cartesian
-        x, y, z = CC.cylindrical_to_cartesian(*vector['end'])
+        x, y, z = CC.cylindrical_to_cartesian_point(*vector['end'])
         cls.xyz_vectors.append({
             'start': (0, 0, 0),
             'end': (x, y, z),
@@ -442,7 +443,7 @@ class Sketch_plane:
         })
 
         # Cylindrical -> Spherical
-        radius, theta, phi = CC.cylindrical_to_spherical(*vector['end'])
+        radius, theta, phi = CC.cylindrical_to_spherical_point(*vector['end'])
         cls.rtp_vectors.append({
             'start': (0, 0, 0),
             'end': (radius, theta, phi),
@@ -454,7 +455,7 @@ class Sketch_plane:
         cls.rtp_vectors.append(vector)
 
         # Spherical -> Cartesian
-        x, y, z = CC.spherical_to_cartesian(*vector['end'])
+        x, y, z = CC.spherical_to_cartesian_point(*vector['end'])
         cls.xyz_vectors.append({
             'start': (0, 0, 0),
             'end': (x, y, z),
@@ -463,7 +464,7 @@ class Sketch_plane:
         })
 
         # Spherical -> Cylindrical
-        rho, phi, z = CC.spherical_to_cylindrical(*vector['end'])
+        rho, phi, z = CC.spherical_to_cylindrical_point(*vector['end'])
         cls.ppz_vectors.append({
             'start': (0, 0, 0),
             'end': (rho, phi, z),
