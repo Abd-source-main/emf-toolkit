@@ -14,20 +14,6 @@ class static_var:
     input_type = "two vectors with c"
 
 
-def make_output_clean(v):
-    # convert Vector or np.array to a plain list of floats rounded to 3 decimal places
-    if isinstance(v, Vector):
-        return [float(round(x, 3)) for x in v.xyz]   # unpack Vector
-    elif isinstance(v, np.ndarray):
-        return [float(round(x, 3)) for x in v]        # unpack NumPy array
-    elif isinstance(v, list):
-        return [float(round(x, 3)) for x in v]        # unpack list
-    elif isinstance(v, str):
-        return v
-    else:
-        return round(v, 3)
-
-
 def process_input(request, input_type):
     x1, y1, z1 = ProcessForm.get_form_input(
         request, ["input_x1", "input_y1", "input_z1"])
@@ -37,8 +23,6 @@ def process_input(request, input_type):
     if input_type == "single vector":
         static_var.input = [*v1.xyz]
         static_var.output = [
-            f"unit vector of vector1: {make_output_clean(unit1)}",
-            f"magnitude of vector1: {make_output_clean(mag1)}"
             f"unit vector of vector1: {make_output_clean(unit1)}",
             f"magnitude of vector1: {make_output_clean(mag1)}"
         ]
@@ -97,22 +81,10 @@ def process_input(request, input_type):
             f"unit vector of vector2: {make_output_clean(unit2)}",
             f"magnitude of vector1: {make_output_clean(mag1)}",
             f"magnitude of vector2: {make_output_clean(mag2)}"
-            f"vector2 - vector1: {make_output_clean(v12)}",
-            f"vector1 + vector2: {make_output_clean(v1.nxyz + v2.nxyz)}",
-            f"magnitude of vector12: {make_output_clean(mag)}",
-            f"unit vector of vector12: {make_output_clean(unit)}",
-            f"cross product vector of vector12: {make_output_clean(cross_prod)}",
-            f"dot product vector of vector12: {make_output_clean(dot_prod)}",
-            f"unit vector of vector1: {make_output_clean(unit1)}",
-            f"unit vector of vector2: {make_output_clean(unit2)}",
-            f"magnitude of vector1: {make_output_clean(mag1)}",
-            f"magnitude of vector2: {make_output_clean(mag2)}"
         ]
     elif input_type == "single vector":
         static_var.input = [*v1.xyz]
         static_var.output = [
-            f"unit vector of vector1: {make_output_clean(unit1)}",
-            f"magnitude of vector1: {make_output_clean(mag1)}"
             f"unit vector of vector1: {make_output_clean(unit1)}",
             f"magnitude of vector1: {make_output_clean(mag1)}"
         ]
@@ -284,3 +256,70 @@ class ProcessForm:
                     flash(str(e) + " in controllers ")
 
         return [], None
+
+    @staticmethod
+    def process_conversion_request(request):
+        CC = CoordinateConverter
+        try:
+            conv_type = request.form.get('conversion_type', 'point')
+            src = request.form.get('src_sys')
+            dest = request.form.get('dest_sys')
+
+            # Input vector/point components
+            try:
+                c1 = float(request.form.get('v1', 0))
+                c2 = float(request.form.get('v2', 0))
+                c3 = float(request.form.get('v3', 0))
+            except ValueError:
+                return "Error: Invalid numeric input"
+
+            raw_result = None
+
+            if conv_type == 'point':
+                # Map source to dest method name
+                method_name = f"{src}_to_{dest}_point"
+
+                if src == dest:
+                    raw_result = (c1, c2, c3)
+                elif hasattr(CC, method_name):
+                    converter = getattr(CC, method_name)
+                    raw_result = converter(c1, c2, c3)
+                else:
+                    return f"Error: {method_name} not implemented."
+
+            elif conv_type == 'vector':
+                # Vector conversion needs a reference point
+                try:
+                    p1 = float(request.form.get('p1', 0))
+                    p2 = float(request.form.get('p2', 0))
+                    p3 = float(request.form.get('p3', 0))
+                except ValueError:
+                    return "Error: Invalid reference point"
+
+                # Map source to dest vector method name
+                method_name = f"vector_{src}_to_{dest}"
+
+                if src == dest:
+                    raw_result = (c1, c2, c3)
+                elif hasattr(CC, method_name):
+                    converter = getattr(CC, method_name)
+                    raw_result = converter(c1, c2, c3, p1, p2, p3)
+                else:
+                    return f"Error: {method_name} not implemented."
+
+            else:
+                return "Error: Invalid conversion type."
+
+            # Apply Engineering Notation Formatting to the results
+            if raw_result is not None:
+                # Ensure raw_result is iterable
+                if not isinstance(raw_result, (list, tuple)):
+                    raw_result = [raw_result]
+
+                formatted_values = [to_eng(val) for val in raw_result]
+                return f"({', '.join(formatted_values)})"
+
+            return "Error: Conversion yielded no result"
+
+        except Exception as e:
+            return f"Error: {str(e)}"
